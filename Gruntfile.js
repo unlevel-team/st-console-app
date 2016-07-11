@@ -21,16 +21,22 @@ module.exports = function(grunt) {
     },
     
     
-    
+    // Copy task (for copy files)
     copy: {
-     lib: {
-	    expand: true,
-	    cwd: './../NLVL_STforBrowser/dist/',
-	    src: '**',
-	    dest: './bower_components/st.forbrowser/dist/',
-	  
-	  }
-	},
+    	
+//    	lib_STconsoleApp: {
+//    		src: './dist/st.consoleApp.min.js',
+//    		dest: './src/lib/st.consoleApp.min.js'
+//    	},
+
+    	lib_STforBrowser: {
+    		expand: true,
+    		cwd: './../NLVL_STforBrowser/dist/',
+    		src: '**',
+    		dest: './bower_components/st.forbrowser/dist/'
+
+    	}
+    },
     
     
     // Babel task (for transpile code)
@@ -44,9 +50,9 @@ module.exports = function(grunt) {
         dist: {
             files: [{
                 "expand": true,
-                "cwd": "src/stforBrowser/",
+                "cwd": "src/stConsoleApp/",
                 "src": ["**/*.js"],
-                "dest": "build/stforBrowser/",
+                "dest": "build/stConsoleApp/",
                 "ext": ".js"
             }]
         }
@@ -67,17 +73,18 @@ module.exports = function(grunt) {
     browserify: {
 
     	build: {
-    		src: 'build/stforBrowser/stforBrowser.js',
-    		dest: 'dist/stforBrowser/stforBrowser.js'
+    		src: 'build/stConsoleApp/consoleApp.js',
+    		dest: 'dist/stConsoleApp/stConsoleApp.js'
     	},
     	
     	dist: {
     		files: {
-    			'dist/stforBrowser/stforBrowser.js': ['build/**/*.js', '!build/**/*-test.js']
+    			'dist/stConsoleApp/stConsoleApp.js': ['build/stConsoleApp/**/*.js', '!build/**/*-test.js']
     		},
     		options: {
     			browserifyOptions: {
-    				debug: true
+    				debug: true,
+    				standalone: "st_ConsoleApp"
     			}
     		}
     	}
@@ -109,7 +116,7 @@ module.exports = function(grunt) {
       },
       dist: {
         files: {
-          'dist/<%= pkg.name %>.min.js': ['dist/stforBrowser/stforBrowser.js']
+          'dist/<%= pkg.name %>.min.js': ['dist/stConsoleApp/stConsoleApp.js']
         }
       }
     },
@@ -125,7 +132,6 @@ module.exports = function(grunt) {
     jshint: {
       files: [
               'Gruntfile.js', 
-              'dist/st.forbrowser.js', 
               'test/**/*.js'
               ],
       options: {

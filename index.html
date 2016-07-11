@@ -26,13 +26,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <!--   Load ST for broser -->
 <script src="bower_components/st.forbrowser/dist/st.forbrowser.min.js"></script>
-<!--   <script type="text/javascript" src="bower_components/st.forbrowser/dist/stforBrowser/stforBrowser.js"></script> -->
 
+<!--   Load ST Console App -->
+<script src="dist/st.consoleApp.min.js"></script>
 
 
 
 <!--   <script type="text/javascript" src="bower_components/requirejs/require.js"></script> -->
-<script src="bower_components/requirejs/require.js"></script>
+<!-- <script src="bower_components/requirejs/require.js"></script> -->
 
 <!-- <script  -->
 <!-- 	data-main="bower_components/st.forbrowser/dist/st_forbrowser.min.js"  -->
@@ -57,27 +58,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 	console.log(st_forBrowser);
 
-
+	var serverConfig = st_forBrowser.get_Server_Config();
+	console.log(serverConfig);
+	
+	
+	console.log(st_ConsoleApp);
+	
+	
 	//   require('st', function (st) {
 	// 	  console.log(st);
 	// 	});
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

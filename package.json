@@ -15,11 +15,12 @@
   ],
   "scripts": {
     "startdev": "polymer serve",
-    "start": "polymer serve",
+    "start": "polymer serve build/bundled",
     "gulp": "gulp",
-    "toES5": "gulp babel",
+    "toES5": "grunt",
     "jsDocs": "gulp docs",
-    "copylibs": "grunt copy:lib"
+    "copylibs": "grunt copy:lib_STforBrowser",
+    "buildApp": "polymer build"
   },
   "dependencies": {
     "body-parser": "~1.15",

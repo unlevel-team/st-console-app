@@ -16,6 +16,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-styles/shadow.html">
 
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+
 
 
 <dom-module id="st-view-NodesList">
@@ -53,10 +55,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       
       
-       h2 {
+      h2 {
         font-size: 19px;
         margin: 16px 0;
-/*         color: #212121; */
       }
       
       iron-list {
@@ -128,9 +129,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
       }
       
+      paper-toast {
+      	width: 340px;
+      	min-width: 140px;
+      	height: 50px;
+      }
+      
+      #toast_Error {
+	    --paper-toast-background-color: red;
+	    --paper-toast-color: white;
+	  }
+      
     </style>
 
-    <div class="card">
+    <div class="card" id="NodesCard">
 <!--       <div class="circle">1</div> -->
       <h1>Nodes</h1>
 
@@ -139,10 +151,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     
     
 	   	<h2>Nodes list</h2>
-		<p>
+		<p id="list_NodesHeader">
 			<paper-button raised on-click="_nodesList">get Nodes List</paper-button>
 		</p>
-		<iron-list id="list" items="[[nodes]]" as="item" selection-enabled multi-selection>
+		<iron-list id="list_Nodes" items="[[nodes]]" as="item" selection-enabled multi-selection>
 	      <template>
 	        <div>
 	          <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
@@ -162,25 +174,58 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	      </template>
 	    </iron-list>
     
-    
+<!--     <paper-toast id="toast_Error"  -->
+<!--     	class="fit-bottom"  -->
+<!-- text="[[toast_ErrorMessage]]"> -->
+    	
+
+		
     </div>
     
-
+    
+    <paper-toast id="toast_Error" 
+    	text="[[toast_ErrorMessage]]"></paper-toast>
+	<paper-toast id="toast_OK" 
+		text="[[toast_Message]]"></paper-toast>
+    
   </template>
 
   <script>
 
-    Polymer({
+    Polymer({ 
 
       is: 'st-view-NodesList',
       
       nodes: {
       	type: Array
       },
+      
+      toast_ErrorMessage: String,
+      toast_Message: String,
+
+      
+      ready: function() {
+    	  var _view = this;
+    	  
+    	  _view._init_Toast();
+      },
+      
+      
+      _init_Toast: function() {
+    	  
+    	  var _view = this;
+//     	  var _toast_Error = _view.$.toast_Error;
+//     	  var _toast_OK = _view.$.toast_OK;
+    	  
+//     	  _view.toast_ErrorMessage = "";
+//     	  _view.toast_Message = "";
+    	  
+      },
+      
        
       attached: function() {
         // Use the document element
-        this.$.list.scrollTarget = this.ownerDocument.documentElement;
+        this.$.list_Nodes.scrollTarget = this.ownerDocument.documentElement;
       },
 
       iconForItem: function(item) {
@@ -198,7 +243,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 			var consoleApp = st_ConsoleApp.get_ConsoleApp();
 			var _view = this;
-			
+	    	var _toast_OK = _view.$.toast_OK;
+	    	var _toast_Error = _view.$.toast_Error;
+	    	var _list_NodesHeader = _view.$.list_NodesHeader;
+	    	
 			try {
 				
 				st_ConsoleApp.nodes.get_NodesList({
@@ -212,10 +260,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 					_view.nodes = data.nodes;
 					
+					// Show toast message
+					_view.toast_Message = "Node list updated... (" + data.numberOfNodes + ")";
+					_toast_OK.fitInto =_list_NodesHeader;
+// 					_toast_OK.fit();
+					_toast_OK.open();
+// 					_toast_OK.show(_view.toast_Message);
+					
 				}, function (error){
 					
 					console.log("st-view-NodesList._nodesList - error...");	// TODO REMOVE DEBUG LOG
 					console.log(error);	// TODO REMOVE DEBUG LOG
+					
+					// Show toast message
+					_view.toast_ErrorMessage = "Cannot get nodes list";
+					_toast_Error.fitInto = _list_NodesHeader;
+// 					_toast_Error.fit();
+					_toast_Error.open();
+// 					_toast_Error.show(_view.toast_ErrorMessage);
+
 				});
 				
 				

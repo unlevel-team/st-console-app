@@ -16,6 +16,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-styles/shadow.html">
 
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+
 
 
 <dom-module id="st-view-EnginesList">
@@ -126,7 +128,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         @apply(--layout-flex);
       }
       
-      
+      #toast_Error {
+	    --paper-toast-background-color: red;
+	    --paper-toast-color: white;
+	  }
       
       
     </style>
@@ -139,7 +144,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	<p>The 'ST Engines' are used by 'ST Nodes' and managed by 'ST Server' using 'ST.Network'.</p>
 
 	<h2>Sensors list</h2>
-	<p>
+	<p id="list_SensorsHeader">
 		<paper-button raised on-click="_sensorsList">get Sensors List</paper-button>
 	</p>
 	<iron-list id="list" items="[[sensors]]" as="item" selection-enabled multi-selection>
@@ -163,7 +168,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </iron-list>
 
 	<h2>Actuators list</h2>
-	<p>
+	<p id="list_ActuatorsHeader">
 		<paper-button raised on-click="_actuatorsList">get Actuators List</paper-button>
 	</p>
     <iron-list id="list" items="[[actuators]]" as="item" selection-enabled multi-selection>
@@ -183,7 +188,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </iron-list>
     
     
-    
+    <paper-toast id="toast_Error" 
+    	text="[[toast_ErrorMessage]]"></paper-toast>
+	<paper-toast id="toast_OK" 
+		text="[[toast_Message]]"></paper-toast>
     </div>
 
   </template>
@@ -193,7 +201,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     Polymer({
 
       is: 'st-view-EnginesList',
-      
+      	
       sensors: {
       	type: Array
       },
@@ -202,6 +210,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       	type: Array
       },
 
+      
+      toast_ErrorMessage: String,
+      toast_Message: String,
+
+      
+      ready: function() {
+    	  var _view = this;
+    	  
+    	  _view._init_Toast();
+      },
+      
+      
+      _init_Toast: function() {
+    	  
+    	  var _view = this;
+    	  var _toast_Error = _view.$.toast_Error;
+    	  var _toast_OK = _view.$.toast_OK;
+    	  
+    	  _view.toast_ErrorMessage = "";
+    	  _view.toast_Message = "";
+
+      },
+      
       
       attached: function() {
         // Use the document element
@@ -223,6 +254,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 			var _consoleApp = st_ConsoleApp.get_ConsoleApp();
 			var _view = this;
+			var _list_SensorsHeader = _view.$.list_SensorsHeader;
+    	    var _toast_Error = _view.$.toast_Error;
+    	    var _toast_OK = _view.$.toast_OK;
 			
 			try {
 				
@@ -237,8 +271,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 					_view.sensors = data.sensors;
 					
+					// Show toast message
+					_toast_OK.close();
+					_view.toast_Message = "Sensors list updated... (" + data.numberOfSensors + ")";
+					_toast_OK.fitInto =_list_SensorsHeader;
+					_toast_OK.open();
+					
 				}, function (error){
 					
+					// Show toast message
+					_toast_Error.close();
+					_view.toast_ErrorMessage = "Cannot get Sensors list";
+					_toast_Error.fitInto = _list_SensorsHeader;
+					_toast_Error.open();
 					
 					console.log("st-view-EnginesList._sensorsList - error...");	// TODO REMOVE DEBUG LOG
 					console.log(error);	// TODO REMOVE DEBUG LOG
@@ -262,6 +307,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 			var _consoleApp = st_ConsoleApp.get_ConsoleApp();
 			var _view = this;
+			var _list_ActuatorsHeader = _view.$.list_ActuatorsHeader;
+    	    var _toast_Error = _view.$.toast_Error;
+    	    var _toast_OK = _view.$.toast_OK;
 
 			try {
 				
@@ -276,8 +324,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 					_view.actuators = data.actuators;
 					
+					// Show toast message
+					_toast_OK.close();
+					_view.toast_Message = "Actuators list updated... (" + data.numberOfActuators + ")";
+					_toast_OK.fitInto =_list_ActuatorsHeader;
+					_toast_OK.open();
+					
 				}, function (error){
 					
+					// Show toast message
+					_toast_OK.close();
+					_view.toast_ErrorMessage = "Cannot get Actuators list";
+					_toast_Error.fitInto = _list_ActuatorsHeader;
+					_toast_Error.open();
 					
 					console.log("st-view-EnginesList._actuatorsList - error...");	// TODO REMOVE DEBUG LOG
 					console.log(error);	// TODO REMOVE DEBUG LOG

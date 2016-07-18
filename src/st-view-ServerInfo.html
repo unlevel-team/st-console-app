@@ -94,13 +94,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		<form is="iron-form" id="serverConfig" hidden>
 <!-- 		<iron-form method="get" action="/" id="eventsDemo"> -->
 		
-		  <paper-input name="netLocation" label="Net location" required auto-validate></paper-input>
-		  <paper-input name="controlPort" label="Control port" required auto-validate></paper-input>
+		  <paper-input name="netLocation" label="Net location" 
+		  		placeholder="[[netLocation]]"
+		  		value="[[netLocation]]"
+		  		required auto-validate></paper-input>
+		  		
+		  <paper-input name="controlPort" label="Control port" 
+		  		placeholder="[[controlPort]]"
+		  		value="[[controlPort]]"
+		  		required auto-validate></paper-input>
 <!-- 		  <paper-checkbox name="read" required>You must check this box</paper-checkbox><br> -->
 		  <paper-button raised on-click="form_delayedSubmit" disabled id="eventsDemoSubmit">
 		    <paper-spinner id="spinner" hidden></paper-spinner>Submit</paper-button>
-		  <paper-button raised on-click="form_reset">Reset</paper-button>
-		  <paper-button raised on-click="form_Hide">Cancel</paper-button>
+		  <paper-button raised on-tap="form_reset">Reset</paper-button>
+		  <paper-button raised on-tap="form_Hide">Cancel</paper-button>
 		  <div class="output"></div>
 		</form>
 	

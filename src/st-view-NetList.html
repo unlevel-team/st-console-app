@@ -1,0 +1,311 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/paper-styles/default-theme.html">
+<link rel="import" href="../bower_components/paper-styles/shadow.html">
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+
+
+<dom-module id="st-view-NetList">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      .card {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        margin: 24px;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #757575;
+      }
+      .circle {
+        display: inline-block;
+        height: 64px;
+        width: 64px;
+        border-radius: 50%;
+        background: #ddd;
+        line-height: 64px;
+        font-size: 30px;
+        color: #555;
+        text-align: center;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 16px 0;
+        color: #212121;
+      }
+      
+      
+      h2 {
+        font-size: 19px;
+        margin: 16px 0;
+      }
+      
+      iron-list {
+        padding-top: 11px;
+        --iron-list-items-container: {
+          max-width: 800px;
+          margin: auto;
+          margin-top: 11px;
+          margin-bottom: 60px;
+          border-bottom: 1px solid #ddd;
+        };
+      }
+
+      .item {
+        @apply(--layout-horizontal);
+        padding: 20px;
+        background-color: white;
+        border: 1px solid #ddd;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      .avatar {
+        height: 40px;
+        width: 40px;
+        border-radius: 20px;
+        box-sizing: border-box;
+        background-color: #DDD;
+      }
+
+      .pad {
+        padding: 0 16px;
+        @apply(--layout-flex);
+        @apply(--layout-vertical);
+      }
+
+      .primary {
+        font-size: 16px;
+        font-weight: bold;
+      }
+
+      .shortText, .longText {
+        font-size: 14px;
+      }
+
+      .longText {
+        color: gray;
+        display: none;
+      }
+
+      .item:hover .shortText::after {
+        content: ' [+]';
+        color: gray;
+      }
+
+      .item.expanded:hover .shortText::after {
+        content: '';
+      }
+
+      .item.expanded .longText {
+        display: block;
+      }
+
+      .item.expanded:hover .longText::after {
+        content: ' [–]';
+      }
+
+      .spacer {
+        @apply(--layout-flex);
+      }
+      
+    </style>
+
+    <div class="card">
+<!--       <div class="circle">1</div> -->
+      <h1>Network</h1>
+    
+    
+    	<p>The 'ST Network' is the part of the 'ST system' that defines how the information data is managed.</p>
+		<p>The definition of 'data channels' and 'binds' provide customizable net topologies that could change in real time.</p>
+		<p>The 'ST Network' also is used for interchange data and control messages between 'ST Nodes' and 'ST Server'.</p>
+    
+	   	<h2>Data channels (nodes)</h2>
+		<p>
+			<paper-button raised on-click="_netListforNodes">get DC List (nodes)</paper-button>
+			
+		</p>
+		<iron-list id="list" items="[[nodes_DCs]]" as="item" selection-enabled multi-selection>
+	      <template>
+	        <div>
+	          <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
+	            <iron-image class="avatar" sizing="contain" src="[[item.image]]"></iron-image>
+	            <div class="pad">
+	              <div class="primary">[[item.nodeID]]</div>
+	              <div class="shortText">[[item.type]]</div>
+	              <div class="longText">
+	              
+	              [[item.longText]]
+	              
+	              </div>
+	            </div>
+	            <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
+	          </div>
+	        </div>
+	      </template>
+	    </iron-list>
+	    
+	    
+	    
+	    
+   	   	<h2>Data channels (server)</h2>
+		<p>
+			<paper-button raised on-click="_netListforServer">get DC List (server)</paper-button>
+		</p>
+		<iron-list id="list" items="[[server_DCs]]" as="item" selection-enabled multi-selection>
+	      <template>
+	        <div>
+	          <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
+	            <iron-image class="avatar" sizing="contain" src="[[item.image]]"></iron-image>
+	            <div class="pad">
+	              <div class="primary">[[item.nodeID]]</div>
+	              <div class="shortText">[[item.type]]</div>
+	              <div class="longText">
+	              
+	              [[item.longText]]
+	              
+	              </div>
+	            </div>
+	            <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
+	          </div>
+	        </div>
+	      </template>
+	    </iron-list>
+    
+    
+    </div>
+    
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'st-view-NetList',
+      
+      nodes_DCs: {
+      	type: Array
+      },
+      
+      server_DCs: {
+      	type: Array
+      },
+       
+      attached: function() {
+        // Use the document element
+        this.$.list.scrollTarget = this.ownerDocument.documentElement;
+      },
+
+      iconForItem: function(item) {
+        return item ? (item.integer < 50 ? 'star-border' : 'star') : '';
+      },
+
+      getClassForItem: function(item, selected) {
+        return selected ? 'item expanded' : 'item';
+      },
+
+
+      _netListforNodes: function(e, detail) {
+    	  
+			console.log("_netListforNodes");	// TODO REMOVE DEBUG LOG
+
+			var consoleApp = st_ConsoleApp.get_ConsoleApp();
+			var _view = this;
+			
+			try {
+				
+				st_ConsoleApp.network.get_DCList({
+					
+					"consoleApp": consoleApp,
+					"netContext": "nodes"
+					
+				}).then(function(data){
+					
+					console.log("st-view-NodesList._netListforNodes - then...");	// TODO REMOVE DEBUG LOG
+					console.log(data);	// TODO REMOVE DEBUG LOG
+
+					_view.nodes_DCs = data.dataChannels;
+					
+				}, function (error){
+					
+					console.log("st-view-NodesList._netListforNodes - error...");	// TODO REMOVE DEBUG LOG
+					console.log(error);	// TODO REMOVE DEBUG LOG
+				});
+				
+				
+			} catch (e) {
+				// TODO: handle exception
+				console.log("Error in Nodes List (nodes)");	// TODO REMOVE DEBUG LOG
+				console.log(e);	// TODO REMOVE DEBUG LOG
+			}
+		
+        	this.fire('kick', {kicked: true});
+        	
+     	},
+     	
+     	
+     	_netListforServer: function(e, detail) {
+      	  
+			console.log("_netListforServer");	// TODO REMOVE DEBUG LOG
+
+			var consoleApp = st_ConsoleApp.get_ConsoleApp();
+			var _view = this;
+			
+			try {
+				
+				st_ConsoleApp.network.get_DCList({
+					
+					"consoleApp": consoleApp,
+					"netContext": "server"
+					
+				}).then(function(data){
+					
+					console.log("st-view-NodesList._netListforServer - then...");	// TODO REMOVE DEBUG LOG
+					console.log(data);	// TODO REMOVE DEBUG LOG
+
+					_view.server_DCs = data.dataChannels;
+					
+				}, function (error){
+					
+					console.log("st-view-NodesList._netListforServer - error...");	// TODO REMOVE DEBUG LOG
+					console.log(error);	// TODO REMOVE DEBUG LOG
+				});
+				
+				
+			} catch (e) {
+				// TODO: handle exception
+				console.log("Error in Nodes List (server)");	// TODO REMOVE DEBUG LOG
+				console.log(e);	// TODO REMOVE DEBUG LOG
+			}
+		
+        	this.fire('kick', {kicked: true});
+        	
+     	}
+      
+      
+
+    });
+
+  </script>
+
+</dom-module>

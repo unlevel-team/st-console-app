@@ -22,9 +22,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="manifest" href="/manifest.json">
 
 
+<!--   Load jQuery library -->
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
 
-
-<!--   Load ST for broser -->
+<!--   Load ST for browser -->
 <script src="bower_components/st.forbrowser/dist/st.forbrowser.min.js"></script>
 
 <!--   Load ST Console App -->
@@ -33,7 +34,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
 <!--   <script type="text/javascript" src="bower_components/requirejs/require.js"></script> -->
-<!-- <script src="bower_components/requirejs/require.js"></script> -->
+<script src="bower_components/requirejs/require.js"></script>
 
 <!-- <script  -->
 <!-- 	data-main="bower_components/st.forbrowser/dist/st_forbrowser.min.js"  -->
@@ -43,8 +44,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 
 <script type="text/javascript">
-
-
   
 // 	require([ 'bower_components/st.forbrowser/dist/st.forbrowser.min.js' ], function(st_forbrowser) {
 // 		console.log(st_forbrowser);
@@ -56,23 +55,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 // 	});
 
 
-	console.log(st_forBrowser);
+	console.log(st_forBrowser);	// TODO REMOVE DEBUG LOG
 
-	var serverConfig = st_forBrowser.get_Server_Config();
-	console.log(serverConfig);
+// 	var serverConfig = st_forBrowser.get_Server_Config();
+// 	console.log(serverConfig);	// TODO REMOVE DEBUG LOG
+	
+	console.log(st_ConsoleApp);	// TODO REMOVE DEBUG LOG
 	
 	
-	console.log(st_ConsoleApp);
+	// Initialize Console App
+	var consoleApp = null;
+	
+	try {
+		
+		consoleApp = st_ConsoleApp.get_ConsoleApp({
+			"config": {
+				"st_forBrowser": st_forBrowser,
+				"dom_Document": document,
+				"dom_Event": CustomEvent,
+				
+				"scs": {
+					"netLocation": "127.0.0.1",
+					"controlPort": 5675
+				}
+			}
+		});
+		
+		console.log("The Console App");	// TODO REMOVE DEBUG LOG
+		console.log(consoleApp);	// TODO REMOVE DEBUG LOG
+		
+	} catch (e) {
+		
+		// TODO: handle exception
+		console.log("Error initializing console App");	// TODO REMOVE DEBUG LOG
+		console.log(e);	// TODO REMOVE DEBUG LOG
+		
+	}
 	
 	
-	//   require('st', function (st) {
-	// 	  console.log(st);
-	// 	});
+	
 </script>
 
 
 
-  <script>
+<script>
 
     // setup Polymer options
     window.Polymer = {lazyRegister: true, dom: 'shadow'};

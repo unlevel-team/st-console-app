@@ -1,0 +1,262 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/paper-styles/default-theme.html">
+<link rel="import" href="../bower_components/paper-styles/shadow.html">
+
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+
+
+<dom-module id="st-view-ServerInfo">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+        padding: 10px;
+      }
+      .card {
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        margin: 24px;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #757575;
+      }
+      .circle {
+        display: inline-block;
+        height: 64px;
+        width: 64px;
+        border-radius: 50%;
+        background: #ddd;
+        line-height: 64px;
+        font-size: 30px;
+        color: #555;
+        text-align: center;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 16px 0;
+        color: #212121;
+      }
+      
+      h2 {
+        font-size: 19px;
+        margin: 16px 0;
+      }
+    </style>
+
+    <div class="card">
+<!--       <div class="circle">1</div> -->
+      <h1>Server</h1>
+      
+      	<p>The 'ST Server' is the part of the 'ST system' where 'ST Nodes' are connected.</p>
+		<p>Use 'ST Network' for provide control messages to 'ST Nodes'.</p>
+		<p>Could be managed by HTTP/REST-JSON service.</p>
+      
+
+<!-- 		<p> -->
+<!-- 			<a href="/view-NodesList">Nodes List</a> -->
+<!-- 		</p> -->
+		
+		<h2>Server Control Service</h2>
+		<p>This is the configuration used by this application for access to HTTP/REST-JSON service</p>
+		<p>The role of this application is defined like an 'administration tool' for manage an 'ST Server'</p>
+		<p>... due to the 'dev-beta environment' of the project... also is a 'test tool' for an 'ST System'... </p>
+		
+		<p>
+			Net location: [[netLocation]]
+		</p>
+		<p>
+			Control port: [[controlPort]]
+		</p>
+		<p>
+			<paper-button id="changeServerConfig" raised on-click="form_Show">Change configuration</paper-button>
+		</p>
+		
+
+		<form is="iron-form" id="serverConfig" hidden>
+<!-- 		<iron-form method="get" action="/" id="eventsDemo"> -->
+		
+		  <paper-input name="netLocation" label="Net location" required auto-validate></paper-input>
+		  <paper-input name="controlPort" label="Control port" required auto-validate></paper-input>
+<!-- 		  <paper-checkbox name="read" required>You must check this box</paper-checkbox><br> -->
+		  <paper-button raised on-click="form_delayedSubmit" disabled id="eventsDemoSubmit">
+		    <paper-spinner id="spinner" hidden></paper-spinner>Submit</paper-button>
+		  <paper-button raised on-click="form_reset">Reset</paper-button>
+		  <paper-button raised on-click="form_Hide">Cancel</paper-button>
+		  <div class="output"></div>
+		</form>
+	
+	
+		
+		
+    </div>
+
+
+
+
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'st-view-ServerInfo',
+      
+      
+      netLocation: String,
+      controlPort: Number,
+    		
+       
+      ready: function() {
+   	  
+		var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+		var _view = this;
+		
+		_view.netLocation = _consoleApp.config.scs.netLocation;
+		_view.controlPort = _consoleApp.config.scs.controlPort;
+    	
+		_view._init_form();
+		
+      },
+      
+      
+      _init_form: function() {
+    	  
+    	  var _view = this;
+    	  var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+    	  var _form = this.$.serverConfig;
+    	  var _buttonSubmit = this.$.eventsDemoSubmit;
+    	  var _spinner = this.$.spinner;
+    	  
+    	  console.log("st-view-ServerInfo._init_form");	// TODO REMOVE DEBUG LOG
+    	  
+    	  _form.addEventListener('change', function(event) {
+    		    // Validate the entire form to see if we should enable the `Submit` button.
+    		    _buttonSubmit.disabled = !_form.validate();
+    		  });
+    	  
+    	  _form.addEventListener('iron-form-submit', function(event) {
+    		  
+        	  var _view = this;
+        	  var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+        	  
+    		  	event.preventDefault();
+    		  	event.stopPropagation();
+    		  	
+    		  	_spinner.active = false;
+    		  	_spinner.hidden = true;
+    		  	_buttonSubmit.disabled = false;
+    		    this.querySelector('.output').innerHTML = JSON.stringify(event.detail);
+    		    
+//     		    var _formContent = JSON.stringify(event.detail);
+    		    var _formContent = event.detail;
+
+    		    
+    		    var _config = {
+    		    		
+    		    	"consoleApp": _consoleApp,
+   		    		"scs": {
+       	  				"netLocation": _formContent.netLocation,
+       	  				"controlPort": _formContent.controlPort
+       	  			}
+    		    };
+    		    
+    			
+//     			console.log("st-view-ServerInfo.iron-form-submit");	// TODO REMOVE DEBUG LOG
+//     			console.log(event.detail);	// TODO REMOVE DEBUG LOG 
+//     			console.log(_formContent);	// TODO REMOVE DEBUG LOG    		    
+//     			console.log(_config);	// TODO REMOVE DEBUG LOG    		    
+    		    
+    	  		_consoleApp.changeConfig(_config);
+    	  		
+    		    
+    		  });
+    	  
+  		_consoleApp.domEvents.addEventListener('configChanged', function(event) {
+		    // Validate the entire form to see if we should enable the `Submit` button.
+// 		    _buttonSubmit.disabled = !_form.validate();
+		    
+	    	  console.log("st-view-ServerInfo.configChanged");	// TODO REMOVE DEBUG LOG
+	    	  console.log(event);	// TODO REMOVE DEBUG LOG
+	    	  
+	    	  _view.netLocation = _consoleApp.config.scs.netLocation;
+	  		  _view.controlPort = _consoleApp.config.scs.controlPort;
+	  		  
+	  		_view.form_Hide();
+	  		
+		  });
+  		
+  		
+      },
+      
+      
+      form_delayedSubmit: function(event) {
+    	  
+    	  var _view = this;
+    	  var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+    	  var _spinner = this.$.spinner;
+    	  var _buttonSubmit = this.$.eventsDemoSubmit;
+    	  var _form = this.$.serverConfig;
+    	  
+    	  _spinner.active = true;
+    	  _spinner.hidden = false;
+    	  _buttonSubmit.disabled = true;
+    	  
+	  	  // Simulate a slow server response.
+	  	  setTimeout(function() {
+	  		  
+// 	  	    Polymer.dom(event).localTarget.parentElement.submit();
+	  	 	 _form.submit();
+
+
+	  	  
+	  	  }, 1000);
+      },
+      
+      
+      form_reset: function(event) {
+    	  
+    	  var _form = Polymer.dom(event).localTarget.parentElement;
+  	      _form.reset();
+  	      _form.querySelector('.output').innerHTML = '';
+    	  
+      },
+      
+      
+      form_Show() {
+    	  var _form = this.$.serverConfig;
+    	  var _changeServerConfig = this.$.changeServerConfig;
+    	  _form.hidden = false;
+    	  _changeServerConfig.disabled = true;
+      },
+      
+      form_Hide() {
+    	  var _form = this.$.serverConfig;
+    	  var _changeServerConfig = this.$.changeServerConfig;
+    	  _form.hidden = true;
+    	  _changeServerConfig.disabled = false;
+      }
+
+    });
+
+  </script>
+
+</dom-module>

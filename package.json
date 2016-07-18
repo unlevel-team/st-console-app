@@ -13,10 +13,23 @@
     "sensor",
     "actuator"
   ],
+  "files": [
+    "src/",
+    "images/",
+	".gitignore",
+	"package.json",
+    "README.md",
+    "jsdoc_conf.json",
+    "gulpfile.js",
+    "Gruntfile.js",
+    "bower.json",
+    "polymer.json",
+    "manifest.json"
+  ],
+          
   "scripts": {
     "startdev": "polymer serve",
     "start": "polymer serve build/bundled",
-    "gulp": "gulp",
     "toES5": "grunt",
     "jsDocs": "gulp docs",
     "copylibs": "grunt copy:lib_STforBrowser",

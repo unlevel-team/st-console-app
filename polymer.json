@@ -2,8 +2,9 @@
   "entrypoint": "index.html",
   "shell": "src/st-console_app.html",
   "fragments": [
-    "src/my-view1.html",
-    "src/my-view2.html",
-    "src/my-view3.html"
+    "src/st-view-NodesList.html",
+    "src/st-view-ServerInfo.html",
+    "src/st-view-EnginesList.html",
+    "src/st-view-NetList.html"
   ]
 }

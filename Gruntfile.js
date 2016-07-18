@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 	  
     pkg: grunt.file.readJSON('package.json'),
     
-    
+    // Rsync task (for copy files)
     rsync: {
         options: {
             args: ["--verbose"],
@@ -73,7 +73,7 @@ module.exports = function(grunt) {
     browserify: {
 
     	build: {
-    		src: 'build/stConsoleApp/consoleApp.js',
+    		src: 'build/stConsoleApp/consoleApp_Lib.js',
     		dest: 'dist/stConsoleApp/stConsoleApp.js'
     	},
     	

@@ -216,7 +216,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       
       ready: function() {
+    	  
     	  var _view = this;
+    	  var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+    	  
+  		  _consoleApp.domEvents.addEventListener('configChanged', function(event) {
+  			
+  	    	  console.log("st-view-EnginesList.configChanged");	// TODO REMOVE DEBUG LOG
+  	    	  console.log(event);	// TODO REMOVE DEBUG LOG
+  	    	  _view.sensors=[];
+  	    	  _view.actuators=[];
+
+  		  });
+    	  
     	  
     	  _view._init_Toast();
       },

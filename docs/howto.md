@@ -2,9 +2,6 @@
 
 
 ## Install required packages
-<<<<<<< HEAD
-=======
-	
 	npm install
 	
 	bower install
@@ -15,14 +12,6 @@
 	npm update
 	
 	bower update
-
-
-## Copy libraries
->>>>>>> refs/heads/master
-	
-	npm install
-	
-	bower install
 	
 	
 ## Update required packages

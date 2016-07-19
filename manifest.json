@@ -1,6 +1,6 @@
 {
-  "name": "My App",
-  "short_name": "My App",
+  "name": "SomeThings Console Application",
+  "short_name": "ST Console App",
     "icons": [{
       "src": "images/app-icon-32.png",
       "type": "image/png",

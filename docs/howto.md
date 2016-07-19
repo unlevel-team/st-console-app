@@ -1,6 +1,16 @@
 # ST Console App
 
 
+## Install the latest version of Bower.
+
+npm install -g bower
+
+
+## Install Polymer CLI.
+
+npm install -g polymer-cli
+
+
 ## Install required packages
 	npm install
 	

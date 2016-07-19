@@ -2,6 +2,23 @@
 
 
 ## Install required packages
+<<<<<<< HEAD
+=======
+	
+	npm install
+	
+	bower install
+	
+	
+## Update required packages
+	
+	npm update
+	
+	bower update
+
+
+## Copy libraries
+>>>>>>> refs/heads/master
 	
 	npm install
 	

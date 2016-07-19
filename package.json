@@ -1,6 +1,10 @@
 {
   "name": "st-console-app",
+<<<<<<< HEAD
   "version": "0.0.1-beta00-build001",
+=======
+  "version": "0.0.1-alpha00-build001",
+>>>>>>> refs/heads/master
   "description": "ST Console App",
   "author": "Unlevel Team <unlevelteam@gmail.com>",
   "main": "index.html",

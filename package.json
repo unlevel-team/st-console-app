@@ -1,12 +1,12 @@
 {
-  "name": "st.consoleApp",
+  "name": "st-console-app",
   "version": "0.0.1-alpha00-build001",
   "description": "ST Console App",
   "author": "Unlevel Team <unlevelteam@gmail.com>",
   "main": "index.html",
   "keywords": [
-    "st.consoleApp",
-    "st.forbrowser",
+    "st-console-app",
+    "st-forbrowser",
     "st",
     "IoT",
     "SomeThings",

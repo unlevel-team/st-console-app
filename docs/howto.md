@@ -1,6 +1,20 @@
 # ST Console App
 
 
+## Install required packages
+	
+	npm install
+	
+	bower install
+	
+	
+## Update required packages
+	
+	npm update
+	
+	bower update
+
+
 ## Copy libraries
 	
 	npm run copylibs

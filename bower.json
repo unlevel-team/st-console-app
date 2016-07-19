@@ -6,13 +6,13 @@
     "Unlevel Team<unlevelteam@gmail.com>"
   ],
   "keywords": [
-	   "st.consoleApp",
-	   "st.forbrowser",
-	   "st",
-	   "IoT",
-	   "SomeThings",
-	   "sensor",
-	   "actuator"
+    "st-console-app",
+    "st-forbrowser",
+    "st",
+    "IoT",
+    "SomeThings",
+    "sensor",
+    "actuator"
   ],
   "ignore": [],
   "private": true,

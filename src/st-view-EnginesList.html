@@ -10,6 +10,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+
 
 <link rel="import" href="../bower_components/paper-styles/color.html">
 <link rel="import" href="../bower_components/paper-styles/default-theme.html">
@@ -17,6 +19,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 
 
 
@@ -121,7 +124,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       .item.expanded:hover .longText::after {
-        content: ' [–]';
+        content: ' [ - ]';
       }
 
       .spacer {
@@ -131,6 +134,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #toast_Error {
 	    --paper-toast-background-color: red;
 	    --paper-toast-color: white;
+	  }
+	  
+	  #engineOptions_Dialog {
+	  	top: 110px;
 	  }
       
       
@@ -147,17 +154,71 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	<p id="list_SensorsHeader">
 		<paper-button raised on-click="_sensorsList">get Sensors List</paper-button>
 	</p>
-	<iron-list id="list" items="[[sensors]]" as="item" selection-enabled multi-selection>
+	<iron-list id="listForSensors" items="[[sensors]]" as="item" selection-enabled multi-selection>
       <template>
         <div>
           <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
-            <iron-image class="avatar" sizing="contain" src="[[item.image]]"></iron-image>
+            <iron-image class="avatar" sizing="contain" src="[[item.image]]"><h2> &nbsp;&nbsp; S </h2></iron-image>
+<!--             <iron-icon icon$="[[iconForItem(item)]]"></iron-icon> -->
+            
             <div class="pad">
               <div class="primary">[[item._sysID]]</div>
-              <div class="shortText">[[item.type]]</div>
+              <div class="shortText"><b>state:</b> [[item.state]]</div>
               <div class="longText">
               
-              [[item.longText]]
+              	<div class="shortText"><b>type:</b> [[item.type]]</div>
+              	<div class="shortText"><b>engine:</b> [[item.engine]]</div>
+              	
+   	           	<div class="shortText">
+	              	<paper-button raised on-click="_engineSettings" 
+	              		data-type="sensor" data-engine$="[[item]]">
+	              	settings
+	              	<iron-icon icon="settings"></iron-icon>  	
+	              	</paper-button>
+	              	<paper-button raised on-click="_enginePlay" disabled>
+	              	run
+	              	<iron-icon icon=play-arrow></iron-icon>  	
+	              	</paper-button>
+              	</div>
+              
+              </div>
+            </div>
+            
+            
+            <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
+          </div>
+        </div>
+      </template>
+    </iron-list>
+
+
+
+	<h2>Actuators list</h2>
+	<p id="list_ActuatorsHeader">
+		<paper-button raised on-click="_actuatorsList">get Actuators List</paper-button>
+	</p>
+    <iron-list id="listForActuators" items="[[actuators]]" as="item" selection-enabled multi-selection>
+      <template>
+        <div>
+          <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
+            <iron-image class="avatar" sizing="contain" src="[[item.image]]"><h2> &nbsp;&nbsp; A </h2></iron-image>
+            <div class="pad">
+              <div class="primary">[[item._sysID]]</div>
+              <div class="shortText"><b>state:</b> [[item.state]]</div>
+              <div class="longText">
+              
+                <div class="shortText"><b>type:</b> [[item.type]]</div>
+              	<div class="shortText"><b>engine:</b> [[item.engine]]</div>
+              
+              	<paper-button raised on-click="_engineSettings" 
+	              		data-type="actuator" data-engine$="[[item]]">
+	              	settings
+	              	<iron-icon icon="settings"></iron-icon>  	
+	              	</paper-button>
+	              	<paper-button raised on-click="_enginePlay">
+	              	run
+	              	<iron-icon icon=play-arrow></iron-icon>  	
+              	</paper-button>
               
               </div>
             </div>
@@ -166,211 +227,459 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
       </template>
     </iron-list>
-
-	<h2>Actuators list</h2>
-	<p id="list_ActuatorsHeader">
-		<paper-button raised on-click="_actuatorsList">get Actuators List</paper-button>
-	</p>
-    <iron-list id="list" items="[[actuators]]" as="item" selection-enabled multi-selection>
-      <template>
-        <div>
-          <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
-            <iron-image class="avatar" sizing="contain" src="[[item.image]]"></iron-image>
-            <div class="pad">
-              <div class="primary">[[item._sysID]]</div>
-              <div class="shortText">[[item.type]]</div>
-              <div class="longText">[[item.longText]]</div>
-            </div>
-            <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
-          </div>
-        </div>
-      </template>
-    </iron-list>
     
     
+<!--  Toast objects -->
     <paper-toast id="toast_Error" 
     	text="[[toast_ErrorMessage]]"></paper-toast>
 	<paper-toast id="toast_OK" 
 		text="[[toast_Message]]"></paper-toast>
     </div>
 
+
+<!--  Engine options dialog -->
+	<paper-dialog id="engineOptions_Dialog" role="dialog" tabindex="-1"
+		aria-hidden="true" class="x-scope paper-dialog-0"
+		style="outline: none; display: none;">
+	
+	
+	<h2>Engine settings</h2>
+		<div class="card">
+<!-- 		<form is="iron-form" id="engineOptions_Form"> -->
+	
+			<p><b>type:</b> {{selectedEngine.type}}</p>
+			<p><b>ID:</b> {{selectedEngine.engine._sysID}}</p>
+			<p><b>engine:</b> {{selectedEngine.engine.engine}}</p>
+			
+			
+	
+<!-- 			<paper-input name="netLocation" label="Net location" -->
+<!-- 				placeholder="[[netLocation]]" value="[[netLocation]]" required -->
+<!-- 				auto-validate></paper-input> -->
+<!-- 		</form> -->
+		</div>
+	
+	<p>Every engine has it's own options. Could be changed when the engine is no working</p>
+		
+	
+		
+	<div class="card">
+			<br>
+			<paper-button raised role="button" tabindex="0" animated=""
+				aria-disabled="false" elevation="0" class="x-scope paper-button-0"
+				on-click="_getEngineOptions">
+			Get options</paper-button>
+			
+			<br><br>
+	</div>
+		
+	<div class="buttons">
+		<paper-button role="button" tabindex="0" animated=""
+			aria-disabled="false" elevation="0" class="x-scope paper-button-0">More
+		Info...</paper-button>
+		<paper-button dialog-dismiss="" role="button" tabindex="0" animated=""
+			aria-disabled="false" elevation="0" class="x-scope paper-button-0">Decline</paper-button>
+		<paper-button dialog-confirm="" autofocus="" role="button" tabindex="0"
+			animated="" aria-disabled="false" elevation="0"
+			class="x-scope paper-button-0">Accept</paper-button>
+	</div>
+	
+	</paper-dialog> 
+
+
   </template>
+  
+  
+  
 
   <script>
+			Polymer({
 
-    Polymer({
+				is: 'st-view-EnginesList',
 
-      is: 'st-view-EnginesList',
-      	
-      sensors: {
-      	type: Array
-      },
-      
-      actuators: {
-      	type: Array
-      },
+				sensors: {
+					type : Array
+				},
 
-      
-      toast_ErrorMessage: String,
-      toast_Message: String,
+				actuators: {
+					type : Array
+				},
 
-      
-      ready: function() {
-    	  
-    	  var _view = this;
-    	  var _consoleApp = st_ConsoleApp.get_ConsoleApp();
-    	  
-  		  _consoleApp.domEvents.addEventListener('configChanged', function(event) {
-  			
-  	    	  console.log("st-view-EnginesList.configChanged");	// TODO REMOVE DEBUG LOG
-  	    	  console.log(event);	// TODO REMOVE DEBUG LOG
-  	    	  _view.sensors=[];
-  	    	  _view.actuators=[];
-
-  		  });
-    	  
-    	  
-    	  _view._init_Toast();
-      },
-      
-      
-      _init_Toast: function() {
-    	  
-    	  var _view = this;
-    	  var _toast_Error = _view.$.toast_Error;
-    	  var _toast_OK = _view.$.toast_OK;
-    	  
-    	  _view.toast_ErrorMessage = "";
-    	  _view.toast_Message = "";
-
-      },
-      
-      
-      attached: function() {
-        // Use the document element
-        this.$.list.scrollTarget = this.ownerDocument.documentElement;
-      },
-
-      iconForItem: function(item) {
-        return item ? (item.integer < 50 ? 'star-border' : 'star') : '';
-      },
-
-      getClassForItem: function(item, selected) {
-        return selected ? 'item expanded' : 'item';
-      },
-
-
-      _sensorsList: function(e, detail) {
-    	  
-			console.log("_sensorsList");	// TODO REMOVE DEBUG LOG
-
-			var _consoleApp = st_ConsoleApp.get_ConsoleApp();
-			var _view = this;
-			var _list_SensorsHeader = _view.$.list_SensorsHeader;
-    	    var _toast_Error = _view.$.toast_Error;
-    	    var _toast_OK = _view.$.toast_OK;
-			
-			try {
+				toast_ErrorMessage: String,
+				toast_Message: String,
 				
-				st_ConsoleApp.engines.sensors.get_SensorsList({
-					
-					"consoleApp": _consoleApp
-					
-				}).then(function(data){
-					
-					console.log("st-view-EnginesList._sensorsList - then...");	// TODO REMOVE DEBUG LOG
-					console.log(data);	// TODO REMOVE DEBUG LOG
+// 				selectedEngine : {
+// 					type : Object
+// 				},
 
-					_view.sensors = data.sensors;
+				properties: {
+					selectedEngine: {
+			          type: Object,
+			          value: function() {
+			            return {
+			            	'type':'eee',
+			            	'engine': {}
+			            };
+			          }
+			        }
+			      },
+
+				ready: function() {
+
+					var _view = this;
+					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+					var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
+
+					_engineOptions_Dialog.fitInto = _view;
+					_engineOptions_Dialog.refit()
+
+					// Map event 'configChanged'
+					_consoleApp.domEvents
+							.addEventListener(
+									'configChanged',
+									function(event) {
+
+										console
+												.log("st-view-EnginesList.configChanged"); // TODO REMOVE DEBUG LOG
+										console.log(event); // TODO REMOVE DEBUG LOG
+										_view.sensors = [];
+										_view.actuators = [];
+
+									});
 					
-					// Show toast message
-					_toast_OK.close();
-					_view.toast_Message = "Sensors list updated... (" + data.numberOfSensors + ")";
-					_toast_OK.fitInto =_list_SensorsHeader;
-					_toast_OK.open();
 					
-				}, function (error){
+// 					_view.selectedEngine = {
+// 							"type": "aaa",
+// 							"engine": null
+// 					};
 					
-					// Show toast message
-					_toast_Error.close();
-					_view.toast_ErrorMessage = "Cannot get Sensors list";
-					_toast_Error.fitInto = _list_SensorsHeader;
-					_toast_Error.open();
+
+					_view._init_Toast();
+				},
+
+				_init_Toast: function() {
+
+					var _view = this;
+					var _toast_Error = _view.$.toast_Error;
+					var _toast_OK = _view.$.toast_OK;
+
+					_view.toast_ErrorMessage = "";
+					_view.toast_Message = "";
+
+				},
+
+				attached: function() {
+					// Use the document element
+					this.$.list.scrollTarget = this.ownerDocument.documentElement;
+				},
+
+				iconForItem: function(item) {
+					//         return item ? (item.integer < 50 ? 'star-border' : 'star') : '';
+					return 'star';
+				},
+
+				getClassForItem: function(item, selected) {
+					return selected ? 'item expanded' : 'item';
+				},
+
+				_sensorsList: function(e, detail) {
+
+					console.log("_sensorsList"); // TODO REMOVE DEBUG LOG
+
+					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+					var _view = this;
+					var _list_SensorsHeader = _view.$.list_SensorsHeader;
+					var _toast_Error = _view.$.toast_Error;
+					var _toast_OK = _view.$.toast_OK;
+
+					try {
+
+						st_ConsoleApp.engines.sensors
+								.get_SensorsList({
+
+									"consoleApp" : _consoleApp
+
+								})
+								.then(
+										function(data) {
+
+											console.log("st-view-EnginesList._sensorsList - then..."); // TODO REMOVE DEBUG LOG
+											console.log(data); // TODO REMOVE DEBUG LOG
+
+											_view.sensors = data.sensors;
+
+											// Show toast message
+											_toast_OK.close();
+											_view.toast_Message = "Sensors list updated... ("
+													+ data.numberOfSensors
+													+ ")";
+											_toast_OK.fitInto = _list_SensorsHeader;
+											_toast_OK.open();
+
+										},
+										function(error) {
+
+											// Show toast message
+											_toast_Error.close();
+											_view.toast_ErrorMessage = "Cannot get Sensors list";
+											_toast_Error.fitInto = _list_SensorsHeader;
+											_toast_Error.open();
+
+											console
+													.log("st-view-EnginesList._sensorsList - error..."); // TODO REMOVE DEBUG LOG
+											console.log(error); // TODO REMOVE DEBUG LOG
+										});
+
+					} catch (e) {
+						// TODO: handle exception
+						console.log("Error in Sensors List"); // TODO REMOVE DEBUG LOG
+						console.log(e); // TODO REMOVE DEBUG LOG
+					}
+
+					this.fire('kick', {
+						kicked : true
+					});
+				},
+
+				_actuatorsList: function(e, detail) {
+
+					console.log("_actuatorsList"); // TODO REMOVE DEBUG LOG
+
+					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+					var _view = this;
+					var _list_ActuatorsHeader = _view.$.list_ActuatorsHeader;
+					var _toast_Error = _view.$.toast_Error;
+					var _toast_OK = _view.$.toast_OK;
+
+					try {
+
+						st_ConsoleApp.engines.actuators
+								.get_ActuatorsList({
+
+									"consoleApp" : _consoleApp
+
+								})
+								.then(function(data) {
+
+										console.log("st-view-EnginesList._actuatorsList - then..."); // TODO REMOVE DEBUG LOG
+										console.log(data); // TODO REMOVE DEBUG LOG
+
+										_view.actuators = data.actuators;
+
+										// Show toast message
+										_toast_OK.close();
+										_view.toast_Message = "Actuators list updated... ("
+												+ data.numberOfActuators
+												+ ")";
+										_toast_OK.fitInto = _list_ActuatorsHeader;
+										_toast_OK.open();
+
+									},
+									function(error) {
+
+									// Show toast message
+									_toast_OK.close();
+									_view.toast_ErrorMessage = "Cannot get Actuators list";
+									_toast_Error.fitInto = _list_ActuatorsHeader;
+									_toast_Error.open();
+
+									console
+											.log("st-view-EnginesList._actuatorsList - error..."); // TODO REMOVE DEBUG LOG
+									console.log(error); // TODO REMOVE DEBUG LOG
+								});
+
+					} catch (e) {
+						// TODO: handle exception
+						console.log("Error in Actuators List"); // TODO REMOVE DEBUG LOG
+						console.log(e); // TODO REMOVE DEBUG LOG
+					}
+
+					this.fire('kick', {
+						kicked : true
+					});
 					
-					console.log("st-view-EnginesList._sensorsList - error...");	// TODO REMOVE DEBUG LOG
-					console.log(error);	// TODO REMOVE DEBUG LOG
-				});
+				},	// enfOf _actuatorsList
+				
+
+				_engineSettings: function(e, detail) {
+
+					console.log("_engineSettings"); // TODO REMOVE DEBUG LOG
+					
+					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+					var _view = this;
+					var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
+					
+					var _selectedEngine = _view.get('selectedEngine');
+					var _button = Polymer.dom(e).localTarget;
+					var _buttonDataSet = _button.dataset;
+
+					_view.selectedEngine.type = _buttonDataSet.type;
+					_view.selectedEngine.engine = JSON.parse(_buttonDataSet.engine);
+					
+					// Notification required for binding to update!
+// 				    _view.notifyPath('selectedEngine', _view.selectedEngine);
+			        _view.notifyPath('selectedEngine.type', _view.selectedEngine.type);
+			        _view.notifyPath('selectedEngine.engine', _view.selectedEngine.engine);
+
+					
+					console.log(e); // TODO REMOVE DEBUG LOG
+					console.log(_button); // TODO REMOVE DEBUG LOG
+					console.log(_button.dataset); // TODO REMOVE DEBUG LOG
+					console.log(_view.selectedEngine); // TODO REMOVE DEBUG LOG
+
+					
+					_engineOptions_Dialog.open();
+					
+				},	// endOf _engineSettings
 				
 				
-			} catch (e) {
-				// TODO: handle exception
-				console.log("Error in Sensors List");	// TODO REMOVE DEBUG LOG
-				console.log(e);	// TODO REMOVE DEBUG LOG
-			}
-		
-        	this.fire('kick', {kicked: true});
-     },
-     
-     
-     
-     _actuatorsList: function(e, detail) {
-   	  
-			console.log("_actuatorsList");	// TODO REMOVE DEBUG LOG
+				_getEngineOptions: function(e, detail) {
+					
+					console.log("_getEngineOptions"); // TODO REMOVE DEBUG LOG
+					
+					var _view = this;
+					var _selectedEngine = _view.get('selectedEngine');
 
-			var _consoleApp = st_ConsoleApp.get_ConsoleApp();
-			var _view = this;
-			var _list_ActuatorsHeader = _view.$.list_ActuatorsHeader;
-    	    var _toast_Error = _view.$.toast_Error;
-    	    var _toast_OK = _view.$.toast_OK;
-
-			try {
-				
-				st_ConsoleApp.engines.actuators.get_ActuatorsList({
-					
-					"consoleApp": _consoleApp
-					
-				}).then(function(data){
-					
-					console.log("st-view-EnginesList._actuatorsList - then...");	// TODO REMOVE DEBUG LOG
-					console.log(data);	// TODO REMOVE DEBUG LOG
-
-					_view.actuators = data.actuators;
-					
-					// Show toast message
-					_toast_OK.close();
-					_view.toast_Message = "Actuators list updated... (" + data.numberOfActuators + ")";
-					_toast_OK.fitInto =_list_ActuatorsHeader;
-					_toast_OK.open();
-					
-				}, function (error){
-					
-					// Show toast message
-					_toast_OK.close();
-					_view.toast_ErrorMessage = "Cannot get Actuators list";
-					_toast_Error.fitInto = _list_ActuatorsHeader;
-					_toast_Error.open();
-					
-					console.log("st-view-EnginesList._actuatorsList - error...");	// TODO REMOVE DEBUG LOG
-					console.log(error);	// TODO REMOVE DEBUG LOG
-				});
+					switch (_selectedEngine.type) {
+						case 'sensor':
+							_view._getSensorOptions();
+							break;
+							
+						case 'actuator':
+							_view._getActuatorOptions();
+							break;
+							
+						default:
+							break;
+					}
+				},	// endOf _getEngineOptions
 				
 				
-			} catch (e) {
-				// TODO: handle exception
-				console.log("Error in Actuators List");	// TODO REMOVE DEBUG LOG
-				console.log(e);	// TODO REMOVE DEBUG LOG
-			}
-		
-     	this.fire('kick', {kicked: true});
-  	}
-     
-     
-     
-     
-     
-     
-    });
+				_getSensorOptions: function() {
+					
+					console.log("_getSensorOptions"); // TODO REMOVE DEBUG LOG
+					
+					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+					var _view = this;
+					var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
+					var _toast_Error = _view.$.toast_Error;
+					var _toast_OK = _view.$.toast_OK;
+					
+					var _selectedEngine = _view.get('selectedEngine');
 
-  </script>
+					
+					try {
+
+						st_ConsoleApp.engines.sensors
+								.get_SensorOptions({
+
+									"consoleApp" : _consoleApp,
+									"sensorID": _selectedEngine.engine._sysID
+
+								})
+								.then(function(data) {
+
+									console.log("st-view-EnginesList._getSensorOptions - then..."); // TODO REMOVE DEBUG LOG
+									console.log(data); // TODO REMOVE DEBUG LOG
+
+									// 	_view.actuators = data.actuators;
+
+									// Show toast message
+									_toast_OK.close();
+									_view.toast_Message = "Sensor options received...";
+									_toast_OK.fitInto = _engineOptions_Dialog;
+									_toast_OK.open();
+
+								},
+								function(error) {
+	
+									// Show toast message
+									_toast_OK.close();
+									_view.toast_ErrorMessage = "Cannot get Sensor options";
+									_toast_Error.fitInto = _engineOptions_Dialog;
+									_toast_Error.open();
+	
+									console
+											.log("st-view-EnginesList._getSensorOptions - error..."); // TODO REMOVE DEBUG LOG
+									console.log(error); // TODO REMOVE DEBUG LOG
+								});
+
+					} catch (e) {
+						// TODO: handle exception
+						console.log("Error in Sensor options"); // TODO REMOVE DEBUG LOG
+						console.log(e); // TODO REMOVE DEBUG LOG
+					}
+
+					this.fire('kick', {
+						kicked : true
+					});
+					
+				},	// endOf _getSensorOptions
+				
+				
+				_getActuatorOptions: function() {
+					
+					console.log("_getActuatorOptions"); // TODO REMOVE DEBUG LOG
+					
+					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+					var _view = this;
+					var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
+					var _toast_Error = _view.$.toast_Error;
+					var _toast_OK = _view.$.toast_OK;
+					
+					var _selectedEngine = _view.get('selectedEngine');
+
+					
+					try {
+
+						st_ConsoleApp.engines.actuators
+								.get_ActuatorOptions({
+
+									"consoleApp" : _consoleApp,
+									"actuatorID": _selectedEngine.engine._sysID
+
+								})
+								.then(function(data) {
+
+									console.log("st-view-EnginesList._getActuatorOptions - then..."); // TODO REMOVE DEBUG LOG
+									console.log(data); // TODO REMOVE DEBUG LOG
+
+									// 	_view.actuators = data.actuators;
+
+									// Show toast message
+									_toast_OK.close();
+									_view.toast_Message = "Actuator options received...";
+									_toast_OK.fitInto = _engineOptions_Dialog;
+									_toast_OK.open();
+
+								},
+								function(error) {
+	
+									// Show toast message
+									_toast_OK.close();
+									_view.toast_ErrorMessage = "Cannot get Actuator options";
+									_toast_Error.fitInto = _engineOptions_Dialog;
+									_toast_Error.open();
+	
+									console
+											.log("st-view-EnginesList._getActuatorOptions - error..."); // TODO REMOVE DEBUG LOG
+									console.log(error); // TODO REMOVE DEBUG LOG
+								});
+
+					} catch (e) {
+						// TODO: handle exception
+						console.log("Error in Actuator options"); // TODO REMOVE DEBUG LOG
+						console.log(e); // TODO REMOVE DEBUG LOG
+					}
+
+					this.fire('kick', {
+						kicked : true
+					});
+					
+				} 	// endOf _getActuatorOptions
+				
+
+			});
+		</script>
 
 </dom-module>

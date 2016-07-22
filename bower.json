@@ -37,8 +37,8 @@
     "paper-toast": "PolymerElements/paper-toast#^1.3.0",
     "polymer": "polymer/polymer#^1.4.0",
     "jquery": "^3.1.0",
-    "st.forbrowser": "./../NLVL_STforBrowser"
-    
+    "st.forbrowser": "./../NLVL_STforBrowser",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.1.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0",

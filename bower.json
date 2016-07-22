@@ -1,6 +1,6 @@
 {
   "name": "st-console-app",
-  "version": "0.0.1-alpha00-build001",
+  "version": "0.0.1-alpha00-build002",
   "description": "ST Console App",
   "authors": [
     "Unlevel Team<unlevelteam@gmail.com>"
@@ -35,10 +35,11 @@
     "paper-button": "PolymerElements/paper-button#^1.0.12",
     "paper-checkbox": "PolymerElements/paper-checkbox#^1.3.0",
     "paper-toast": "PolymerElements/paper-toast#^1.3.0",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.1.0",
     "polymer": "polymer/polymer#^1.4.0",
     "jquery": "^3.1.0",
-    "st.forbrowser": "./../NLVL_STforBrowser",
-    "paper-dialog": "PolymerElements/paper-dialog#^1.1.0"
+    "st.forbrowser": "./../NLVL_STforBrowser"
+    
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0",

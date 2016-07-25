@@ -47,17 +47,11 @@ function get_DCList(options) {
 			"netContext": _netContext,
 			
 			"_onComplete": function(data) {
-				
-				console.log("<~i~> st.consoleApp.network.get_DCList._onComplete");	// TODO REMOVE DEBUG LOG
-				console.log(data);	// TODO REMOVE DEBUG LOG
 
 			}
 			
 			
 		}).then(function(data){
-			
-			console.log("<~i~> st.consoleApp.network.get_DCList.then");	// TODO REMOVE DEBUG LOG
-			console.log(data);	// TODO REMOVE DEBUG LOG
 			
 			resolve(data);
 			

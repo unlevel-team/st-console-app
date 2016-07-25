@@ -140,6 +140,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 	  	top: 110px;
 	  }
       
+      .elementHidden {
+      	display: none;
+      }
+      
+      
       
     </style>
 
@@ -152,7 +157,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 	<h2>Sensors list</h2>
 	<p id="list_SensorsHeader">
-		<paper-button raised on-click="_sensorsList">get Sensors List</paper-button>
+		<paper-button raised 
+			on-tap="_enginesList"
+			data-type="sensor">
+			get Sensors List
+		</paper-button>
 	</p>
 	<iron-list id="listForSensors" items="[[sensors]]" as="item" selection-enabled multi-selection>
       <template>
@@ -161,7 +170,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <iron-image class="avatar" sizing="contain" src="[[item.image]]"><h2> &nbsp;&nbsp; S </h2></iron-image>
 <!--             <iron-icon icon$="[[iconForItem(item)]]"></iron-icon> -->
             
-            <div class="pad">
+            <div class="pad" on-tap="_updateLists">
               <div class="primary">[[item._sysID]]</div>
               <div class="shortText"><b>state:</b> [[item.state]]</div>
               <div class="longText">
@@ -170,20 +179,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               	<div class="shortText"><b>engine:</b> [[item.engine]]</div>
               	
    	           	<div class="shortText">
-	              	<paper-button raised on-click="_engineSettings" 
-	              		data-type="sensor" data-engine$="[[item]]">
-	              	settings
-	              	<iron-icon icon="settings"></iron-icon>  	
+	              	<paper-button raised 
+	              		on-tap="_engineSettings" 
+	              		data-type="sensor"
+	              		data-engineid$="[[item._sysID]]">
+	              		settings
+	              		<iron-icon icon="settings"></iron-icon>  	
 	              	</paper-button>
-	              	<paper-button raised on-click="_enginePlay" disabled>
+	              	<paper-button raised on-tap="_engineRun" 
+	              		class$="[[getClassForButton(item, 'start')]]"
+	              		data-type="sensor" 
+	              		data-command="start"
+	              		data-engineid$="[[item._sysID]]">
 	              	run
 	              	<iron-icon icon=play-arrow></iron-icon>  	
-	              	</paper-button>
+           			</paper-button>
+              		<paper-button raised on-tap="_engineRun" 
+              			class$="[[getClassForButton(item, 'stop')]]"
+	              		data-type="sensor" 
+	              		data-command="stop"
+	              		data-engineid$="[[item._sysID]]">
+	              	run
+	              	<iron-icon icon=stop></iron-icon>  	
+           			</paper-button>
               	</div>
               
               </div>
             </div>
-            
             
             <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
           </div>
@@ -192,17 +214,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </iron-list>
 
 
-
 	<h2>Actuators list</h2>
 	<p id="list_ActuatorsHeader">
-		<paper-button raised on-click="_actuatorsList">get Actuators List</paper-button>
+		<paper-button raised 
+			on-tap="_enginesList"
+			data-type="actuator">
+			get Actuators List
+			</paper-button>
 	</p>
-    <iron-list id="listForActuators" items="[[actuators]]" as="item" selection-enabled multi-selection>
+    <iron-list id="listForActuators" 
+    	items="[[actuators]]" as="item" 
+    	selection-enabled multi-selection
+    	scroll-target="document">
       <template>
         <div>
           <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
             <iron-image class="avatar" sizing="contain" src="[[item.image]]"><h2> &nbsp;&nbsp; A </h2></iron-image>
-            <div class="pad">
+            <div class="pad" on-tap="_updateLists">
               <div class="primary">[[item._sysID]]</div>
               <div class="shortText"><b>state:</b> [[item.state]]</div>
               <div class="longText">
@@ -210,16 +238,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <div class="shortText"><b>type:</b> [[item.type]]</div>
               	<div class="shortText"><b>engine:</b> [[item.engine]]</div>
               
-              	<paper-button raised on-click="_engineSettings" 
-	              		data-type="actuator" data-engine$="[[item]]">
+              	<paper-button raised 
+              			on-click="_engineSettings" 
+	              		data-type="actuator" 
+	              		data-engineid$="[[item._sysID]]">
 	              	settings
 	              	<iron-icon icon="settings"></iron-icon>  	
-	              	</paper-button>
-	              	<paper-button raised on-click="_enginePlay">
+              	</paper-button>
+              	<paper-button raised on-click="_engineRun" 
+	              		data-type="actuator" 
+	              		data-command="start"
+	              		data-engine$="[[item]]"
+	              		data-engineid$="[[item._sysID]]"
+	              		class$="[[getClassForButton(item, 'start')]]">
 	              	run
 	              	<iron-icon icon=play-arrow></iron-icon>  	
-              	</paper-button>
-              
+           		</paper-button>
+           		<paper-button raised on-tap="_engineRun" 
+              			class$="[[getClassForButton(item, 'stop')]]"
+	              		data-type="actuator" 
+	              		data-command="stop"
+	              		data-engineid$="[[item._sysID]]">
+	              	stop
+	              	<iron-icon icon=stop></iron-icon>  	
+           		</paper-button>
               </div>
             </div>
             <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
@@ -298,11 +340,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				is: 'st-view-EnginesList',
 
 				sensors: {
-					type : Array
+					type : Array,
+					notify: true
 				},
 
 				actuators: {
-					type : Array
+					type : Array,
+					notify: true
 				},
 
 				toast_ErrorMessage: String,
@@ -318,11 +362,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			          value: function() {
 			            return {
 			            	'type':'eee',
+			            	'engineid':'eee',
 			            	'engine': {}
 			            };
 			          }
 			        }
-			      },
+			    },
+			      
+			      
+			    observers: [
+                  	'engineChanged(sensors.*)',
+                  	'engineChanged(actuators.*)'
+                ],
+                engineChanged: function(changeRecord) {
+                	console.log('path: ' + changeRecord.path);	// TODO REMOVE DEBUG LOG
+			        console.log('value: ' + changeRecord.value);	// TODO REMOVE DEBUG LOG
+			        console.log(changeRecord.value);	// TODO REMOVE DEBUG LOG
+                },
 
 				ready: function() {
 
@@ -339,19 +395,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 									'configChanged',
 									function(event) {
 
-										console
-												.log("st-view-EnginesList.configChanged"); // TODO REMOVE DEBUG LOG
+										console.log("st-view-EnginesList.configChanged"); // TODO REMOVE DEBUG LOG
 										console.log(event); // TODO REMOVE DEBUG LOG
+										
 										_view.sensors = [];
 										_view.actuators = [];
 
 									});
 					
-					
-// 					_view.selectedEngine = {
-// 							"type": "aaa",
-// 							"engine": null
-// 					};
 					
 
 					_view._init_Toast();
@@ -370,7 +421,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 				attached: function() {
 					// Use the document element
-					this.$.list.scrollTarget = this.ownerDocument.documentElement;
+// 					this.$.listForSensors.scrollTarget = this.ownerDocument.documentElement;
+// 					this.$.listForActuators.scrollTarget = this.ownerDocument.documentElement;
+					
+					// Use the document element
+// 					this.$.listForSensors.scrollTarget = this.$.listForSensors_Container;
+// 					this.$.listForActuators.scrollTarget = this;
+
 				},
 
 				iconForItem: function(item) {
@@ -379,99 +436,110 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				},
 
 				getClassForItem: function(item, selected) {
+					
 					return selected ? 'item expanded' : 'item';
 				},
-
-				_sensorsList: function(e, detail) {
-
-					console.log("_sensorsList"); // TODO REMOVE DEBUG LOG
-
-					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
-					var _view = this;
-					var _list_SensorsHeader = _view.$.list_SensorsHeader;
-					var _toast_Error = _view.$.toast_Error;
-					var _toast_OK = _view.$.toast_OK;
-
-					try {
-
-						st_ConsoleApp.engines.sensors
-								.get_SensorsList({
-
-									"consoleApp" : _consoleApp
-
-								})
-								.then(
-										function(data) {
-
-											console.log("st-view-EnginesList._sensorsList - then..."); // TODO REMOVE DEBUG LOG
-											console.log(data); // TODO REMOVE DEBUG LOG
-
-											_view.sensors = data.sensors;
-
-											// Show toast message
-											_toast_OK.close();
-											_view.toast_Message = "Sensors list updated... ("
-													+ data.numberOfSensors
-													+ ")";
-											_toast_OK.fitInto = _list_SensorsHeader;
-											_toast_OK.open();
-
-										},
-										function(error) {
-
-											// Show toast message
-											_toast_Error.close();
-											_view.toast_ErrorMessage = "Cannot get Sensors list";
-											_toast_Error.fitInto = _list_SensorsHeader;
-											_toast_Error.open();
-
-											console
-													.log("st-view-EnginesList._sensorsList - error..."); // TODO REMOVE DEBUG LOG
-											console.log(error); // TODO REMOVE DEBUG LOG
-										});
-
-					} catch (e) {
-						// TODO: handle exception
-						console.log("Error in Sensors List"); // TODO REMOVE DEBUG LOG
-						console.log(e); // TODO REMOVE DEBUG LOG
+				
+				getClassForButton: function(item, button) {
+					
+					switch (button) {
+						case 'start':
+							return (item.state === 'config' || item.state === 'ready') ? '' : 'elementHidden';
+							
+						case 'stop':
+							return (item.state === 'working') ? '' : 'elementHidden';
+	
+						default:
+							return '';
 					}
-
-					this.fire('kick', {
-						kicked : true
-					});
+					
 				},
+				
+				
+				_updateLists: function() {
+					
+					console.log("_updateLists"); // TODO REMOVE DEBUG LOG
 
-				_actuatorsList: function(e, detail) {
+					// this.$.listForSensors.render();
+					this.$.listForSensors.fire('iron-resize');
+					this.$.listForActuators.fire('iron-resize');
+					
 
-					console.log("_actuatorsList"); // TODO REMOVE DEBUG LOG
+				},	
+				
+				
+				_enginesList: function(e, detail) {
+					
+					console.log("_enginesList"); // TODO REMOVE DEBUG LOG
 
 					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
 					var _view = this;
-					var _list_ActuatorsHeader = _view.$.list_ActuatorsHeader;
+					
+					var _button = Polymer.dom(e).localTarget;
+					var _buttonDataSet = _button.dataset;
+					
+					var _type = _buttonDataSet.type;
+					
 					var _toast_Error = _view.$.toast_Error;
 					var _toast_OK = _view.$.toast_OK;
-
+					
+					var _toastRef = null;
+					var _scs_Request = null;
+					var _scs_RequestOptions = null;
+					
+					switch (_type) {
+						case 'sensor':
+							_scs_Request = st_ConsoleApp.engines.sensors.get_SensorsList;
+							_toastRef = _view.$.list_SensorsHeader;
+							break;
+							
+						case 'actuator':
+							_scs_Request = st_ConsoleApp.engines.actuators.get_ActuatorsList;
+							_toastRef = _view.$.list_ActuatorsHeader;
+							break;
+	
+						default:
+							break;
+					}
+					
+					if (_scs_Request === null) {
+						return;
+					}
+					
 					try {
+						
+						_scs_RequestOptions = {
+								"consoleApp" : _consoleApp
+						};
 
-						st_ConsoleApp.engines.actuators
-								.get_ActuatorsList({
-
-									"consoleApp" : _consoleApp
-
-								})
+						_scs_Request(_scs_RequestOptions)
 								.then(function(data) {
 
-										console.log("st-view-EnginesList._actuatorsList - then..."); // TODO REMOVE DEBUG LOG
+										console.log("st-view-EnginesList._enginesList - then..."); // TODO REMOVE DEBUG LOG
 										console.log(data); // TODO REMOVE DEBUG LOG
-
-										_view.actuators = data.actuators;
+										
+										var _numOfEngines = 0;
+										switch (_type) {
+											case 'sensor':
+												_view.sensors = data.sensors;
+												_numOfEngines = data.numberOfSensors;
+												break;
+											case 'actuator':
+												_view.actuators = data.actuators;
+												_numOfEngines = data.numberOfActuators;
+												break;
+	
+											default:
+												break;
+										}
+										
 
 										// Show toast message
 										_toast_OK.close();
-										_view.toast_Message = "Actuators list updated... ("
-												+ data.numberOfActuators
+										_view.toast_Message = "Engines list updated... ("
+												+ _numOfEngines
 												+ ")";
-										_toast_OK.fitInto = _list_ActuatorsHeader;
+										_toast_OK.fitInto = _toastRef;
 										_toast_OK.open();
 
 									},
@@ -479,28 +547,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 									// Show toast message
 									_toast_OK.close();
-									_view.toast_ErrorMessage = "Cannot get Actuators list";
-									_toast_Error.fitInto = _list_ActuatorsHeader;
+									_view.toast_ErrorMessage = "Cannot get Engines list";
+									_toast_Error.fitInto = _toastRef;
 									_toast_Error.open();
 
-									console
-											.log("st-view-EnginesList._actuatorsList - error..."); // TODO REMOVE DEBUG LOG
+									console.log("st-view-EnginesList._enginesList - error..."); // TODO REMOVE DEBUG LOG
 									console.log(error); // TODO REMOVE DEBUG LOG
 								});
 
 					} catch (e) {
 						// TODO: handle exception
-						console.log("Error in Actuators List"); // TODO REMOVE DEBUG LOG
+						console.log("Error in Engines List"); // TODO REMOVE DEBUG LOG
 						console.log(e); // TODO REMOVE DEBUG LOG
 					}
 
-					this.fire('kick', {
-						kicked : true
-					});
 					
-				},	// enfOf _actuatorsList
+					
+				},	// enfOf _enginesList
 				
-
+				
 				_engineSettings: function(e, detail) {
 
 					console.log("_engineSettings"); // TODO REMOVE DEBUG LOG
@@ -512,23 +577,71 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					var _selectedEngine = _view.get('selectedEngine');
 					var _button = Polymer.dom(e).localTarget;
 					var _buttonDataSet = _button.dataset;
-
-					_view.selectedEngine.type = _buttonDataSet.type;
-					_view.selectedEngine.engine = JSON.parse(_buttonDataSet.engine);
 					
-					// Notification required for binding to update!
-// 				    _view.notifyPath('selectedEngine', _view.selectedEngine);
-			        _view.notifyPath('selectedEngine.type', _view.selectedEngine.type);
-			        _view.notifyPath('selectedEngine.engine', _view.selectedEngine.engine);
+					var _ngnList = null;
+
+					_selectedEngine.type = _buttonDataSet.type;
+					_selectedEngine.engineid = _buttonDataSet.engineid;
+					// _selectedEngine.engine = JSON.parse(_buttonDataSet.engine);
+					
+
 
 					
 					console.log(e); // TODO REMOVE DEBUG LOG
 					console.log(_button); // TODO REMOVE DEBUG LOG
 					console.log(_button.dataset); // TODO REMOVE DEBUG LOG
 					console.log(_view.selectedEngine); // TODO REMOVE DEBUG LOG
-
 					
+					
+					switch (_selectedEngine.type) {
+					
+						case 'sensor':
+							_ngnList = _view.sensors;
+							break;
+							
+						case 'actuator':
+							_ngnList = _view.actuators;
+							break;
+							
+						default:
+							break;
+					}
+					
+					
+					if (_ngnList === null) {
+						return;
+					}
+					
+					var _searchEngine = _consoleApp.engines.NGN_Manager.getEngineByID({
+						"engineID": _selectedEngine.engineid,
+						"list": _ngnList
+						});
+
+
+					if (_searchEngine.engine === null) {
+						return;
+					}
+					
+					_selectedEngine.engine = _searchEngine.engine;
+					
+					/*
 					_engineOptions_Dialog.open();
+					
+					// Notification required for binding to update!
+			        _view.notifyPath('selectedEngine.type', _view.selectedEngine.type);
+			        _view.notifyPath('selectedEngine.engine', _view.selectedEngine.engine);
+			        */
+			        
+					_view.async(function(){
+						_engineOptions_Dialog.open();
+					}, 167);
+					
+					_view.async(function(){
+						// Notification required for binding to update!
+				        _view.notifyPath('selectedEngine.type', _view.selectedEngine.type);
+				        _view.notifyPath('selectedEngine.engine', _view.selectedEngine.engine);
+					}, 267);
+					
 					
 				},	// endOf _engineSettings
 				
@@ -539,145 +652,360 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					
 					var _view = this;
 					var _selectedEngine = _view.get('selectedEngine');
+					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+					
+					var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
+					var _toast_Error = _view.$.toast_Error;
+					var _toast_OK = _view.$.toast_OK;
+					
+					var _scs_Request = null;
+					var _scs_RequestOptions = null;
+					
 
 					switch (_selectedEngine.type) {
+					
 						case 'sensor':
-							_view._getSensorOptions();
+							
+							_scs_Request = st_ConsoleApp.engines.sensors.get_SensorOptions;
+							_scs_RequestOptions = {
+									"consoleApp" : _consoleApp,
+									"sensorID": _selectedEngine.engine._sysID
+								};
+							
+							
+							
 							break;
 							
 						case 'actuator':
-							_view._getActuatorOptions();
+							
+							_scs_Request = st_ConsoleApp.engines.actuators.get_ActuatorOptions;
+							_scs_RequestOptions = {
+									"consoleApp" : _consoleApp,
+									"actuatorID": _selectedEngine.engine._sysID
+								};
 							break;
 							
 						default:
 							break;
 					}
+					
+					if (_scs_Request === null) {
+						return;
+					}
+					
+					try {
+
+						_scs_Request(_scs_RequestOptions)
+								.then(function(data) {
+
+									console.log("st-view-EnginesList._getEngineOptions - then..."); // TODO REMOVE DEBUG LOG
+									console.log(data); // TODO REMOVE DEBUG LOG
+
+									// 	_view.actuators = data.actuators;
+
+									// Show toast message
+									_toast_OK.close();
+									_view.toast_Message = "Engine options received...";
+									_toast_OK.fitInto = _engineOptions_Dialog;
+									_toast_OK.open();
+
+								},
+								function(error) {
+	
+									// Show toast message
+									_toast_OK.close();
+									_view.toast_ErrorMessage = "Cannot get Engine options";
+									_toast_Error.fitInto = _engineOptions_Dialog;
+									_toast_Error.open();
+	
+									console.log("st-view-EnginesList._getEngineOptions - error..."); // TODO REMOVE DEBUG LOG
+									console.log(error); // TODO REMOVE DEBUG LOG
+								});
+
+					} catch (e) {
+						// TODO: handle exception
+						console.log("Error in Engine options"); // TODO REMOVE DEBUG LOG
+						console.log(e); // TODO REMOVE DEBUG LOG
+					}
+					
+					
 				},	// endOf _getEngineOptions
 				
 				
-				_getSensorOptions: function() {
+				_engineDetail: function(options){
 					
-					console.log("_getSensorOptions"); // TODO REMOVE DEBUG LOG
-					
-					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
 					var _view = this;
-					var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
-					var _toast_Error = _view.$.toast_Error;
-					var _toast_OK = _view.$.toast_OK;
+					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
 					
-					var _selectedEngine = _view.get('selectedEngine');
+					var _type = options.type;
+					var _engineID = options.engineID;
+					var _model = options.model;
+					
+					var _scs_Request = null;
+					var _scs_RequestOptions = null;
+					var _ngnList = null;
+					var _ngnListView = null;
+					
+					
+					switch (_type) {
+					
+						case 'sensor':
+							
+							_scs_Request = st_ConsoleApp.engines.sensors.get_SensorInfo;
+							_scs_RequestOptions = {
+								"consoleApp" : _consoleApp,
+								"sensorID": _engineID
+							};
+						
+							_ngnListView = _view.$.listForSensors;
+							_ngnListViewStr = 'listForSensors';
+							_ngnList = _view.sensors;
+							// _notifyPath = 'listForSensors.items';
+							_notifyPath = 'sensors';
+							
+							break;
+							
+						case 'actuator':
+							
+							_scs_Request = st_ConsoleApp.engines.actuators.get_ActuatorInfo;
+							_scs_RequestOptions = {
+								"consoleApp" : _consoleApp,
+								"actuatorID": _engineID
+							};
+							
+							_ngnListView = _view.$.listForActuators;
+							_ngnListViewStr = 'listForActuators';
+							_ngnList = _view.actuators;
+							// _notifyPath = 'listForActuators.items';
+							_notifyPath = 'actuators';
+							
+							break;
+	
+						default:
+							break;
+					}
+					
+					if (_scs_Request === null) {
+						return;
+					}
+					
+					var _searchEngine = _consoleApp.engines.NGN_Manager.getEngineByID({
+						"engineID": _engineID,
+						"list": _ngnList
+						});
 
+
+					if (_searchEngine.engine === null) {
+						return;
+					}
+					
 					
 					try {
 
-						st_ConsoleApp.engines.sensors
-								.get_SensorOptions({
-
-									"consoleApp" : _consoleApp,
-									"sensorID": _selectedEngine.engine._sysID
-
-								})
+						_scs_Request( _scs_RequestOptions )
 								.then(function(data) {
 
-									console.log("st-view-EnginesList._getSensorOptions - then..."); // TODO REMOVE DEBUG LOG
+									console.log("st-view-EnginesList._engineDetail - then..."); // TODO REMOVE DEBUG LOG
 									console.log(data); // TODO REMOVE DEBUG LOG
+									
+									switch (_type) {
+										case 'sensor':
+											
+											_ngnList.splice(_searchEngine.position, 1, data.sensor);
+											_ngnList = _ngnList.slice();
+											break;
+											
+										case 'actuator':
+											_ngnList.splice(_searchEngine.position, 1, data.actuator);
+											_ngnList = _ngnList.slice();
+											
+											break;
+	
+										default:
+											break;
+									}
+									
+									
+									
+									// Notify DOM change
+									
+									_view.async(function(){
+										_view.notifyPath(
+												_notifyPath, 
+												_ngnList);
+									}, 267);
+									
+									_view.async(function(){
+										_ngnListView.selectItem(_searchEngine.position);
+										_ngnListView.fire('iron-resize');
+									}, 367);
+									
+									
 
-									// 	_view.actuators = data.actuators;
+								},
+								function(error) {
+	
+									console.log("st-view-EnginesList._engineDetail - error..."); // TODO REMOVE DEBUG LOG
+									console.log(error); // TODO REMOVE DEBUG LOG
+								});
 
+					} catch (e) {
+						// TODO: handle exception
+						console.log("Error in Engine detail"); // TODO REMOVE DEBUG LOG
+						console.log(e); // TODO REMOVE DEBUG LOG
+					}
+					
+					
+				},	// endOf _engineDetail
+				
+				
+				_engineRun: function(e, detail) {
+					
+					console.log("_engineRun"); // TODO REMOVE DEBUG LOG
+					
+					var _view = this;
+					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+					var _toast_Error = _view.$.toast_Error;
+					var _toast_OK = _view.$.toast_OK;
+					
+					var _model = e.model;
+					var _button = Polymer.dom(e).localTarget;
+					var _buttonDataSet = _button.dataset;
+					
+					var _type = _buttonDataSet.type;
+					var _command = _buttonDataSet.command;
+					var _engineID = _buttonDataSet.engineid;
+					
+					var _scs_Request = null;
+					var _scs_RequestOptions = null;
+					var _enginesList = null;
+					var _notifyPath = null;
+					
+					console.log(e.model); // TODO REMOVE DEBUG LOG
+
+					switch (_type) {
+					
+						case 'sensor':	// Sensor engine
+							
+							_scs_RequestOptions = {
+								"consoleApp" : _consoleApp,
+								"sensorID": _engineID
+							};
+						
+							_enginesList = _view.$.listForSensors.items;
+							_notifyPath = 'listForSensors.list';
+							
+							switch (_command) {
+								case 'start':
+									_scs_Request = st_ConsoleApp.engines.sensors.start_Sensor;
+									break;
+	
+								case 'stop':
+									_scs_Request = st_ConsoleApp.engines.sensors.stop_Sensor;
+									break;
+									
+								default:
+									break;
+							}
+							
+							break;
+							
+							
+						case 'actuator':	// Actuator engine
+						
+							_scs_RequestOptions = {
+								"consoleApp" : _consoleApp,
+								"actuatorID": _engineID
+							};
+						
+							_enginesList = _view.$.listForActuators.items;
+							_notifyPath = 'listForActuators.list';
+							
+							switch (_command) {
+								case 'start':
+									_scs_Request = st_ConsoleApp.engines.actuators.start_Actuator;
+									break;
+	
+								case 'stop':
+									_scs_Request = st_ConsoleApp.engines.actuators.stop_Actuator;
+									break;
+									
+								default:
+									break;
+							}
+							
+							break;
+							
+						default:
+							break;
+					}
+					
+					
+					
+					if (_scs_Request === null) {
+						return;
+					}
+					
+					
+					var _searchEngine = _consoleApp.engines.NGN_Manager.getEngineByID({
+												"engineID": _engineID,
+												"list": _enginesList
+												});
+					
+					
+					if (_searchEngine.engine === null) {
+						return;
+					}
+					
+					
+					try {
+
+						_scs_Request( _scs_RequestOptions )
+								.then(function(data) {
+
+									console.log("st-view-EnginesList._engineRun - then..."); // TODO REMOVE DEBUG LOG
+									console.log(data); // TODO REMOVE DEBUG LOG
+									
 									// Show toast message
 									_toast_OK.close();
-									_view.toast_Message = "Sensor options received...";
-									_toast_OK.fitInto = _engineOptions_Dialog;
+									_view.toast_Message = "Engine command (" + _command +  ") transmited.";
+									_toast_OK.fitInto = Polymer.dom(_button).parentNode;
+									// _toast_OK.fitInto = _refButton;
 									_toast_OK.open();
+									
+									
+									// Get detail of Engine (500ms later)
+									
+									_view.async(function(){
+										_view._engineDetail({
+											"type": _type,
+											"engineID": _engineID,
+											"list": _enginesList,
+											"model": _model
+										});
+									}, 436);
 
 								},
 								function(error) {
 	
 									// Show toast message
 									_toast_OK.close();
-									_view.toast_ErrorMessage = "Cannot get Sensor options";
-									_toast_Error.fitInto = _engineOptions_Dialog;
-									_toast_Error.open();
-	
-									console
-											.log("st-view-EnginesList._getSensorOptions - error..."); // TODO REMOVE DEBUG LOG
-									console.log(error); // TODO REMOVE DEBUG LOG
-								});
-
-					} catch (e) {
-						// TODO: handle exception
-						console.log("Error in Sensor options"); // TODO REMOVE DEBUG LOG
-						console.log(e); // TODO REMOVE DEBUG LOG
-					}
-
-					this.fire('kick', {
-						kicked : true
-					});
-					
-				},	// endOf _getSensorOptions
-				
-				
-				_getActuatorOptions: function() {
-					
-					console.log("_getActuatorOptions"); // TODO REMOVE DEBUG LOG
-					
-					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
-					var _view = this;
-					var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
-					var _toast_Error = _view.$.toast_Error;
-					var _toast_OK = _view.$.toast_OK;
-					
-					var _selectedEngine = _view.get('selectedEngine');
-
-					
-					try {
-
-						st_ConsoleApp.engines.actuators
-								.get_ActuatorOptions({
-
-									"consoleApp" : _consoleApp,
-									"actuatorID": _selectedEngine.engine._sysID
-
-								})
-								.then(function(data) {
-
-									console.log("st-view-EnginesList._getActuatorOptions - then..."); // TODO REMOVE DEBUG LOG
-									console.log(data); // TODO REMOVE DEBUG LOG
-
-									// 	_view.actuators = data.actuators;
-
-									// Show toast message
-									_toast_OK.close();
-									_view.toast_Message = "Actuator options received...";
-									_toast_OK.fitInto = _engineOptions_Dialog;
+									_view.toast_ErrorMessage = "Error in Engine command: (" + _command +  ")";
+									_toast_OK.fitInto = Polymer.dom(_button).parentNode;
+									// _toast_OK.fitInto = _refButton;
 									_toast_OK.open();
-
-								},
-								function(error) {
 	
-									// Show toast message
-									_toast_OK.close();
-									_view.toast_ErrorMessage = "Cannot get Actuator options";
-									_toast_Error.fitInto = _engineOptions_Dialog;
-									_toast_Error.open();
-	
-									console
-											.log("st-view-EnginesList._getActuatorOptions - error..."); // TODO REMOVE DEBUG LOG
+									console.log("st-view-EnginesList._engineRun - error..."); // TODO REMOVE DEBUG LOG
 									console.log(error); // TODO REMOVE DEBUG LOG
 								});
 
 					} catch (e) {
 						// TODO: handle exception
-						console.log("Error in Actuator options"); // TODO REMOVE DEBUG LOG
+						console.log("Error in Engine Run"); // TODO REMOVE DEBUG LOG
 						console.log(e); // TODO REMOVE DEBUG LOG
 					}
-
-					this.fire('kick', {
-						kicked : true
-					});
 					
-				} 	// endOf _getActuatorOptions
-				
+				},	// endOf _engineRun
 
 			});
 		</script>

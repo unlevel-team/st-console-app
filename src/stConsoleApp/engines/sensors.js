@@ -88,8 +88,8 @@ function get_SensorInfo(options) {
 	let _consoleApp = options.consoleApp;
 	let _SCSRequestsForEngines = _consoleApp.engines.SCS_Requests;
 	
-	console.log("<~i~> st.consoleApp.engines.sensors.get_SensorInfo");	// TODO REMOVE DEBUG LOG
-	console.log(_consoleApp);	// TODO REMOVE DEBUG LOG
+//	console.log("<~i~> st.consoleApp.engines.sensors.get_SensorInfo");	// TODO REMOVE DEBUG LOG
+//	console.log(_consoleApp);	// TODO REMOVE DEBUG LOG
 	
 	
 	let promise = new Promise(function(resolve, reject) {
@@ -101,23 +101,17 @@ function get_SensorInfo(options) {
 			
 			"_onComplete": function(data) {
 				
-				console.log("<~i~> st.consoleApp.engines.sensors.get_SensorInfo._onComplete");	// TODO REMOVE DEBUG LOG
-				console.log(data);	// TODO REMOVE DEBUG LOG
 
 			}
 		
 		}).then(function(value) {
 			
-			console.log("<~i~> st.consoleApp.engines.sensors.get_SensorInfo.then");	// TODO REMOVE DEBUG LOG
-			console.log(value);	// TODO REMOVE DEBUG LOG
 			
 			resolve(value);
 			
 		}, function(reason) {
-			
 			console.log("<~i~> st.consoleApp.engines.sensors.get_SensorInfo.error");	// TODO REMOVE DEBUG LOG
 			console.log(reason);	// TODO REMOVE DEBUG LOG
-			
 			reject(Error("It broke"));
 		});
 		
@@ -145,9 +139,6 @@ function get_SensorOptions(options) {
 	let _consoleApp = options.consoleApp;
 	let _SCSRequestsForEngines = _consoleApp.engines.SCS_Requests;
 	
-	console.log("<~i~> st.consoleApp.engines.sensors.get_SensorOptions");	// TODO REMOVE DEBUG LOG
-	console.log(_consoleApp);	// TODO REMOVE DEBUG LOG
-	
 	
 	let promise = new Promise(function(resolve, reject) {
 		
@@ -158,21 +149,113 @@ function get_SensorOptions(options) {
 			
 			"_onComplete": function(data) {
 				
-				console.log("<~i~> st.consoleApp.engines.sensors.get_SensorOptions._onComplete");	// TODO REMOVE DEBUG LOG
-				console.log(data);	// TODO REMOVE DEBUG LOG
 
 			}
 		
 		}).then(function(value) {
 			
-			console.log("<~i~> st.consoleApp.engines.sensors.get_SensorOptions.then");	// TODO REMOVE DEBUG LOG
-			console.log(value);	// TODO REMOVE DEBUG LOG
 			
 			resolve(value);
 			
 		}, function(reason) {
 			
 			console.log("<~i~> st.consoleApp.engines.sensors.get_SensorOptions.error");	// TODO REMOVE DEBUG LOG
+			console.log(reason);	// TODO REMOVE DEBUG LOG
+			reject(Error("It broke"));
+		});
+		
+	});
+	
+	return promise;
+}
+
+
+/**
+ * Start Sensor
+ * 
+ * @memberof st.consoleApp.engines.sensors
+ * @public
+ * 
+ * @param {object} options - Options
+ * @param {st.consoleApp.ConsoleApp} options.consoleApp - Console App reference
+ * @param {string} options.sensorID - Sensor ID
+ * 
+ * @returns {Promise}
+ * 
+ */
+function start_Sensor(options) {
+	
+	let _consoleApp = options.consoleApp;
+	let _SCSRequestsForEngines = _consoleApp.engines.SCS_Requests;
+	
+	
+	let promise = new Promise(function(resolve, reject) {
+		
+		_SCSRequestsForEngines.start_Sensor({
+			
+			"scsClient": _consoleApp.scsClient,
+			"sensorID": options.sensorID,
+			
+			"_onComplete": function(data) {
+				
+
+			}
+		
+		}).then(function(value) {
+			
+			resolve(value);
+			
+		}, function(reason) {
+			
+			console.log("<~i~> st.consoleApp.engines.sensors.start_Sensor.error");	// TODO REMOVE DEBUG LOG
+			console.log(reason);	// TODO REMOVE DEBUG LOG
+			
+			reject(Error("It broke"));
+		});
+		
+	});
+	
+	return promise;
+}
+
+
+/**
+ * Stop Sensor
+ * 
+ * @memberof st.consoleApp.engines.sensors
+ * @public
+ * 
+ * @param {object} options - Options
+ * @param {st.consoleApp.ConsoleApp} options.consoleApp - Console App reference
+ * @param {string} options.sensorID - Sensor ID
+ * 
+ * @returns {Promise}
+ * 
+ */
+function stop_Sensor(options) {
+	
+	let _consoleApp = options.consoleApp;
+	let _SCSRequestsForEngines = _consoleApp.engines.SCS_Requests;
+	
+	
+	let promise = new Promise(function(resolve, reject) {
+		
+		_SCSRequestsForEngines.stop_Sensor({
+			
+			"scsClient": _consoleApp.scsClient,
+			"sensorID": options.sensorID,
+			
+			"_onComplete": function(data) {
+				
+			}
+		
+		}).then(function(value) {
+			
+			resolve(value);
+			
+		}, function(reason) {
+			
+			console.log("<~i~> st.consoleApp.engines.sensors.stop_Sensor.error");	// TODO REMOVE DEBUG LOG
 			console.log(reason);	// TODO REMOVE DEBUG LOG
 			
 			reject(Error("It broke"));
@@ -185,17 +268,19 @@ function get_SensorOptions(options) {
 
 
 
-
 let _lib = {
 	"get_SensorsList": get_SensorsList,
 	"get_SensorInfo": get_SensorInfo,
 	"get_SensorOptions": get_SensorOptions,
-
+	"start_Sensor": start_Sensor,
+	"stop_Sensor": stop_Sensor,
 	
 	"_public": {
 		"get_SensorsList": get_SensorsList,
 		"get_SensorInfo": get_SensorInfo,
-		"get_SensorOptions": get_SensorOptions
+		"get_SensorOptions": get_SensorOptions,
+		"start_Sensor": start_Sensor,
+		"stop_Sensor": stop_Sensor
 	}
 		
 };

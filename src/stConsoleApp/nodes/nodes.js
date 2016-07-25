@@ -41,17 +41,11 @@ function get_NodesList(options) {
 			"scsClient": _consoleApp.scsClient,
 			
 			"_onComplete": function(data) {
-				
-				console.log("<~i~> st.consoleApp.nodes.get_NodeList._onComplete");	// TODO REMOVE DEBUG LOG
-				console.log(data);	// TODO REMOVE DEBUG LOG
 
 			}
 			
 			
 		}).then(function(data){
-			
-			console.log("<~i~> st.consoleApp.nodes.get_NodeList.then");	// TODO REMOVE DEBUG LOG
-			console.log(data);	// TODO REMOVE DEBUG LOG
 			
 			resolve(data);
 			

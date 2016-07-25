@@ -166,6 +166,7 @@ class ConsoleApp {
 
 		consoleApp.engines = {};
 		consoleApp.engines.SCS_Requests = _ST_forBrowser.engines.get_SCS_Requests();
+		consoleApp.engines.NGN_Manager = _ST_forBrowser.engines.get_Engines_Manager();
 		
 	}
 	

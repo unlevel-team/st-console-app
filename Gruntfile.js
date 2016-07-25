@@ -33,7 +33,7 @@ module.exports = function(grunt) {
     		expand: true,
     		cwd: './../NLVL_STforBrowser/dist/',
     		src: '**',
-    		dest: './bower_components/st.forbrowser/dist/'
+    		dest: './bower_components/st-forbrowser/dist/'
 
     	}
     },

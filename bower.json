@@ -1,6 +1,6 @@
 {
   "name": "st-console-app",
-  "version": "0.0.1-beta00-build002",
+  "version": "0.0.1-beta00-build003",
   "description": "ST Console App",
   "authors": [
     "Unlevel Team<unlevelteam@gmail.com>"
@@ -38,7 +38,7 @@
     "paper-dialog": "PolymerElements/paper-dialog#^1.1.0",
     "polymer": "polymer/polymer#^1.4.0",
     "jquery": "^3.1.0",
-    "st-forbrowser": "git://github.com/unlevel-team/st-forbrowser.git#0.0.1-beta00-build002"
+    "st-forbrowser": "git://github.com/unlevel-team/st-forbrowser.git#0.0.1-beta00-build003"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0",

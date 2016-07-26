@@ -9,9 +9,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/iron-form/iron-form.html">
-
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 
 <link rel="import" href="../bower_components/paper-styles/color.html">
 <link rel="import" href="../bower_components/paper-styles/default-theme.html">
@@ -99,6 +100,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       .primary {
         font-size: 16px;
         font-weight: bold;
+/*         cursor: pointer; */
       }
 
       .shortText, .longText {
@@ -109,23 +111,40 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: gray;
         display: none;
       }
-
-      .item:hover .shortText::after {
+      
+      /*
+      .item:hover .primary::after {
         content: ' [+]';
         color: gray;
       }
+      */
 
-      .item.expanded:hover .shortText::after {
-        content: '';
+	  /*
+      .item:hover + .shortText::after {
+        content: ' [+]';
+        color: gray;
       }
+      */
+
+      .item.expanded:hover .shortText.detail::after {
+        content: ' [ - ]';
+      }
+	  
+      .item:hover .shortText.detail::after {
+        content: ' [+]';
+        color: gray;
+      }
+      
 
       .item.expanded .longText {
         display: block;
       }
 
+      /*
       .item.expanded:hover .longText::after {
         content: ' [ - ]';
       }
+      */
 
       .spacer {
         @apply(--layout-flex);
@@ -154,7 +173,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       
 	<p>The ST Engines is the part of the 'ST system' that defines the interactions with real world using specific devices like sensors or actuators.</p>
 	<p>The 'ST Engines' are used by 'ST Nodes' and managed by 'ST Server' using 'ST.Network'.</p>
-
+	
+<!-- 	Sensors list -->
 	<h2>Sensors list</h2>
 	<p id="list_SensorsHeader">
 		<paper-button raised 
@@ -163,48 +183,60 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			get Sensors List
 		</paper-button>
 	</p>
-	<iron-list id="listForSensors" items="[[sensors]]" as="item" selection-enabled multi-selection>
+	
+	<iron-list id="listForSensors" 
+		items="[[sensors]]" as="item"
+		selection-enabled multi-selection
+    	scroll-target="document">
       <template>
-        <div>
+        <div on-tap="_updateLists" 
+        	class="listItem"
+        	name$="[[item._sysID]]">
+        	
           <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
-            <iron-image class="avatar" sizing="contain" src="[[item.image]]"><h2> &nbsp;&nbsp; S </h2></iron-image>
+            <iron-image class="avatar" 
+            	sizing="contain" 
+            	src="[[item.image]]">
+            	<h2> &nbsp;&nbsp; S </h2>
+            </iron-image>
 <!--             <iron-icon icon$="[[iconForItem(item)]]"></iron-icon> -->
             
-            <div class="pad" on-tap="_updateLists">
-              <div class="primary">[[item._sysID]]</div>
-              <div class="shortText"><b>state:</b> [[item.state]]</div>
-              <div class="longText">
+            <div class="pad">
+              <div class="primary">
+              	[[item._sysID]]
+              </div>
+              <div class="shortText detail"><b>state:</b> [[item.state]]</div>
+
+<!-- 				<iron-collapse class="hiddenSection" name$="[[item._sysID]]"> -->
+				
+				<div class="longText">
               
               	<div class="shortText"><b>type:</b> [[item.type]]</div>
               	<div class="shortText"><b>engine:</b> [[item.engine]]</div>
               	
-   	           	<div class="shortText">
+              	<p>
 	              	<paper-button raised 
-	              		on-tap="_engineSettings" 
-	              		data-type="sensor"
-	              		data-engineid$="[[item._sysID]]">
+	              		on-tap="_engineSettings">
 	              		settings
 	              		<iron-icon icon="settings"></iron-icon>  	
 	              	</paper-button>
-	              	<paper-button raised on-tap="_engineRun" 
-	              		class$="[[getClassForButton(item, 'start')]]"
-	              		data-type="sensor" 
-	              		data-command="start"
-	              		data-engineid$="[[item._sysID]]">
+	              	<paper-button raised 
+	              		on-tap="_engineStart" 
+	              		class$="[[getClassForButton(item, 'start')]]">
 	              	run
 	              	<iron-icon icon=play-arrow></iron-icon>  	
            			</paper-button>
-              		<paper-button raised on-tap="_engineRun" 
-              			class$="[[getClassForButton(item, 'stop')]]"
-	              		data-type="sensor" 
-	              		data-command="stop"
-	              		data-engineid$="[[item._sysID]]">
+              		<paper-button raised 
+              			on-tap="_engineStop" 
+              			class$="[[getClassForButton(item, 'stop')]]">
 	              	run
 	              	<iron-icon icon=stop></iron-icon>  	
            			</paper-button>
-              	</div>
+         		</p>
               
               </div>
+              
+<!--               </iron-collapse> -->
             </div>
             
             <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
@@ -213,7 +245,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </template>
     </iron-list>
 
-
+<!-- 	Actuators list -->
 	<h2>Actuators list</h2>
 	<p id="list_ActuatorsHeader">
 		<paper-button raised 
@@ -227,41 +259,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     	selection-enabled multi-selection
     	scroll-target="document">
       <template>
-        <div>
+        <div on-tap="_updateLists">
           <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
             <iron-image class="avatar" sizing="contain" src="[[item.image]]"><h2> &nbsp;&nbsp; A </h2></iron-image>
-            <div class="pad" on-tap="_updateLists">
+            <div class="pad">
               <div class="primary">[[item._sysID]]</div>
-              <div class="shortText"><b>state:</b> [[item.state]]</div>
+              <div class="shortText detail"><b>state:</b> [[item.state]]</div>
+              
               <div class="longText">
               
                 <div class="shortText"><b>type:</b> [[item.type]]</div>
               	<div class="shortText"><b>engine:</b> [[item.engine]]</div>
               
+              	<p>
               	<paper-button raised 
-              			on-click="_engineSettings" 
-	              		data-type="actuator" 
-	              		data-engineid$="[[item._sysID]]">
+              			on-tap="_engineSettings">
 	              	settings
 	              	<iron-icon icon="settings"></iron-icon>  	
               	</paper-button>
-              	<paper-button raised on-click="_engineRun" 
-	              		data-type="actuator" 
-	              		data-command="start"
-	              		data-engine$="[[item]]"
-	              		data-engineid$="[[item._sysID]]"
+              	<paper-button raised 
+              			on-tap="_engineStart"
 	              		class$="[[getClassForButton(item, 'start')]]">
 	              	run
 	              	<iron-icon icon=play-arrow></iron-icon>  	
            		</paper-button>
-           		<paper-button raised on-tap="_engineRun" 
-              			class$="[[getClassForButton(item, 'stop')]]"
-	              		data-type="actuator" 
-	              		data-command="stop"
-	              		data-engineid$="[[item._sysID]]">
+           		<paper-button raised 
+           				on-tap="_engineStop"
+              			class$="[[getClassForButton(item, 'stop')]]">
 	              	stop
 	              	<iron-icon icon=stop></iron-icon>  	
            		</paper-button>
+           		</p>
+           		
               </div>
             </div>
             <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
@@ -281,7 +310,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <!--  Engine options dialog -->
 	<paper-dialog id="engineOptions_Dialog" role="dialog" tabindex="-1"
-		aria-hidden="true" class="x-scope paper-dialog-0"
+		aria-hidden="true" 
+		class="x-scope paper-dialog-0"
 		style="outline: none; display: none;">
 	
 	
@@ -456,6 +486,42 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				},
 				
 				
+				
+				_toggleItemDetail: function(e, detail) {
+					
+					console.log("_toggleItemDetail"); // TODO REMOVE DEBUG LOG
+					
+					var _view = this;
+					
+					// var _button = Polymer.dom(e).localTarget;
+					var _button = Polymer.dom(e).currentTarget;
+					var _buttonDataSet = _button.dataset;
+
+					
+					var _collapse = null;
+					
+					// Polymer.dom(this.root).querySelector('#cancelButton');
+					// Polymer.dom(this.root).querySelectorAll('paper-icon-button[icon="cloud"]');
+					_collapse = Polymer.dom(_view.root)
+						.querySelector('iron-collapse.hiddenSection[name="' + _buttonDataSet.engineid + '"]');
+					
+					console.log(_collapse); // TODO REMOVE DEBUG LOG
+
+					if (_collapse === undefined || 
+							_collapse === null) {
+						return;
+					}
+					
+					
+					_collapse.toggle();
+					
+					_view.async(function(){
+						_view._updateLists();
+					}, 267);
+					
+				},
+				
+				
 				_updateLists: function() {
 					
 					console.log("_updateLists"); // TODO REMOVE DEBUG LOG
@@ -476,6 +542,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					var _view = this;
 					
 					var _button = Polymer.dom(e).localTarget;
+// 					var _button = Polymer.dom(e).rootTarget;
 					var _buttonDataSet = _button.dataset;
 					
 					var _type = _buttonDataSet.type;
@@ -520,12 +587,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 										
 										var _numOfEngines = 0;
 										switch (_type) {
+										
 											case 'sensor':
-												_view.sensors = data.sensors;
+												
+												var _sensors = [];
+												data.sensors.forEach(function(_sns, _i) {
+													_sns._type = 'sensor';
+													_sensors.push(_sns);
+												});
+												
+												// _view.sensors = data.sensors;
+												_view.sensors = _sensors.splice(0);
 												_numOfEngines = data.numberOfSensors;
 												break;
+												
 											case 'actuator':
-												_view.actuators = data.actuators;
+												
+												var _actuators = [];
+												data.actuators.forEach(function(_act, _i) {
+													_act._type = 'actuator';
+													_actuators.push(_act);
+												});
+												
+												//_view.actuators = data.actuators;
+												_view.actuators = _actuators.splice(0);
 												_numOfEngines = data.numberOfActuators;
 												break;
 	
@@ -575,22 +660,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
 					
 					var _selectedEngine = _view.get('selectedEngine');
+					
+					var _model = e.model;
+					var _item = _model.item;
 					var _button = Polymer.dom(e).localTarget;
-					var _buttonDataSet = _button.dataset;
+					// var _button = Polymer.dom(e).rootTarget;
+					// var _buttonDataSet = _button.dataset;
 					
 					var _ngnList = null;
 
-					_selectedEngine.type = _buttonDataSet.type;
-					_selectedEngine.engineid = _buttonDataSet.engineid;
-					// _selectedEngine.engine = JSON.parse(_buttonDataSet.engine);
+					// _selectedEngine.type = _buttonDataSet.type;
+					// _selectedEngine.engineid = _buttonDataSet.engineid;
+					
+					console.log(_item); // TODO REMOVE DEBUG LOG
+
+					
+					_selectedEngine.type = _item._type;
+					_selectedEngine.engineid = _item._sysID;
 					
 
-
 					
-					console.log(e); // TODO REMOVE DEBUG LOG
-					console.log(_button); // TODO REMOVE DEBUG LOG
-					console.log(_button.dataset); // TODO REMOVE DEBUG LOG
-					console.log(_view.selectedEngine); // TODO REMOVE DEBUG LOG
+					// console.log(_button); // TODO REMOVE DEBUG LOG
+					// console.log(_button.dataset); // TODO REMOVE DEBUG LOG
+					// console.log(_view.selectedEngine); // TODO REMOVE DEBUG LOG
 					
 					
 					switch (_selectedEngine.type) {
@@ -609,6 +701,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					
 					
 					if (_ngnList === null) {
+						console.log("NO _ngnList"); // TODO REMOVE DEBUG LOG
 						return;
 					}
 					
@@ -631,6 +724,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			        _view.notifyPath('selectedEngine.type', _view.selectedEngine.type);
 			        _view.notifyPath('selectedEngine.engine', _view.selectedEngine.engine);
 			        */
+			        
+			        e.stopPropagation();
 			        
 					_view.async(function(){
 						_engineOptions_Dialog.open();
@@ -809,13 +904,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 									console.log(data); // TODO REMOVE DEBUG LOG
 									
 									switch (_type) {
+									
 										case 'sensor':
+											
+											data.sensor._type = 'sensor';
 											
 											_ngnList.splice(_searchEngine.position, 1, data.sensor);
 											_ngnList = _ngnList.slice();
 											break;
 											
 										case 'actuator':
+											
+											data.actuator._type = 'actuator';
+											
 											_ngnList.splice(_searchEngine.position, 1, data.actuator);
 											_ngnList = _ngnList.slice();
 											
@@ -859,7 +960,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				},	// endOf _engineDetail
 				
 				
-				_engineRun: function(e, detail) {
+				
+				
+				
+				// Engine run: button, model, command
+				_engineRun: function(button, model, command) {
 					
 					console.log("_engineRun"); // TODO REMOVE DEBUG LOG
 					
@@ -868,21 +973,28 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					var _toast_Error = _view.$.toast_Error;
 					var _toast_OK = _view.$.toast_OK;
 					
-					var _model = e.model;
-					var _button = Polymer.dom(e).localTarget;
-					var _buttonDataSet = _button.dataset;
+					// var _button = Polymer.dom(e).localTarget;
+					var _button = button;
 					
-					var _type = _buttonDataSet.type;
-					var _command = _buttonDataSet.command;
-					var _engineID = _buttonDataSet.engineid;
+					var _model = model;
+					var _item = _model.item;
+					var _type = _item._type;
+					
+					var _command = command;
+					var _engineID = _item._sysID;
 					
 					var _scs_Request = null;
 					var _scs_RequestOptions = null;
 					var _enginesList = null;
 					var _notifyPath = null;
 					
-					console.log(e.model); // TODO REMOVE DEBUG LOG
+					
+					console.log(_item); // TODO REMOVE DEBUG LOG
+					console.log(_command); // TODO REMOVE DEBUG LOG
 
+					
+					
+					
 					switch (_type) {
 					
 						case 'sensor':	// Sensor engine
@@ -943,6 +1055,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					
 					
 					if (_scs_Request === null) {
+						console.log("No _scs_Request"); // TODO REMOVE DEBUG LOG
 						return;
 					}
 					
@@ -1006,6 +1119,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 					}
 					
 				},	// endOf _engineRun
+				
+				
+				_engineStart: function(e, detail) {
+					
+					var _view = this;
+					var _model = e.model;
+					var _button = Polymer.dom(e).localTarget;
+					
+					_view._engineRun(_button, _model, 'start');
+					
+				},	// endOf _engineStart
+				
+				_engineStop: function(e, detail) {
+					
+					var _view = this;
+					var _model = e.model;
+					var _button = Polymer.dom(e).localTarget;
+					
+					_view._engineRun(_button, _model, 'stop');
+					
+				}	// endOf _engineStop
 
 			});
 		</script>

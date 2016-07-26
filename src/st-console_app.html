@@ -34,7 +34,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       app-header {
-        background-color: var(--app-primary-color);
+        background-color: var(--app-primary-color); 
         color: #fff;
       }
       app-header paper-icon-button {
@@ -145,9 +145,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     	 
       	console.log("Page Changed");	// TODO REMOVE DEBUG LOG 
     	 
+      	
         // load page import on demand.
+        if (page.substring(0, 3) === "st-") {	// not for 'st-' pages...
+        	this.importHref(
+			          this.resolveUrl(page + '.html'), null, null, true);    
+		} else {
+			this.importHref(
+			          this.resolveUrl('st-' + page + '.html'), null, null, true);
+		}
+      	
+      	
+      	
+      	/*
         this.importHref(
-          this.resolveUrl('st-' + page + '.html'), null, null, true);
+		          this.resolveUrl('st-' + page + '.html'), null, null, true);
+        */
+        
       },
       
       

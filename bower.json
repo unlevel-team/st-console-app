@@ -1,6 +1,6 @@
 {
   "name": "st-console-app",
-  "version": "0.0.1-beta00-build004",
+  "version": "0.0.1-beta00-build005",
   "description": "ST Console App",
   "authors": [
     "Unlevel Team<unlevelteam@gmail.com>"
@@ -14,7 +14,11 @@
     "sensor",
     "actuator"
   ],
-  "ignore": [],
+  "ignore": [
+    "jsdoc_out/",
+    "bower_components/",
+    "node_modules/"
+  ],
   "private": true,
   "dependencies": {
     "app-layout": "polymerelements/app-layout#^0.9.0",

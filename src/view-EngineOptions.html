@@ -1,0 +1,415 @@
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/paper-styles/default-theme.html">
+<link rel="import" href="../bower_components/paper-styles/shadow.html">
+
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+
+
+<dom-module id="st-view-EngineOptions">
+
+	<link rel="import" type="css" href="styles.css">
+
+  <template>
+
+	<style>
+		paper-checkbox .subtitle {
+			display: block;
+			font-size: 0.8em;
+			margin-top: 2px;
+			max-width: 150px;
+		}
+	</style>
+
+
+<!--  Toast objects -->
+    <paper-toast id="toast_Error" 
+    	text="[[toast_ErrorMessage]]"></paper-toast>
+	<paper-toast id="toast_OK" 
+		text="[[toast_Message]]"></paper-toast>
+    </div>
+
+
+
+<!--  Engine options dialog -->
+	<paper-dialog id="engineOptions_Dialog" role="dialog" tabindex="-1"
+		aria-hidden="true" 
+		class="x-scope paper-dialog-0"
+		style="outline: none; display: none;">
+	
+	
+	<h2>Engine settings</h2>
+	
+		<div class="card">
+<!-- 		<form is="iron-form" id="engineOptions_Form"> -->
+			<p>
+			<b>type:</b> {{selectedEngine.type}}> <br>
+			<b>ID:</b> {{selectedEngine.engine._sysID}} <br>
+			<b>engine:</b> {{selectedEngine.engine.engine}}
+			</p>
+			
+	
+<!-- 			<paper-input name="netLocation" label="Net location" -->
+<!-- 				placeholder="[[netLocation]]" value="[[netLocation]]" required -->
+<!-- 				auto-validate></paper-input> -->
+<!-- 		</form> -->
+		</div>
+	
+	
+	<paper-dialog-scrollable>
+		<div class="card">
+		
+		<p>Every engine has it's own options. Could be changed when the engine is not working</p>
+		
+		<iron-collapse class="hiddenSection" name="engineOptions">
+		
+			<form is="iron-form" id="engineOptions_Form">
+			
+				<paper-input name="loopTime" 
+					label="Loop time"
+					placeholder="[[selectedEngine.ngnoptions.loopTime]]" 
+					value="[[selectedEngine.ngnoptions.loopTime]]" 
+					required hidden
+					auto-validate></paper-input>
+				
+				<paper-checkbox name="showDeltaTime" hidden>
+				  Show delta time
+				  <span class="subtitle">Diference between engine events</span>
+				</paper-checkbox>
+				
+				<paper-checkbox name="showTime" hidden>
+				  Show current time
+				  <span class="subtitle">Current time</span>
+				</paper-checkbox>
+	
+				<paper-input name="ticks" 
+					label="Ticks"
+					placeholder="[[selectedEngine.ngnoptions.engineOptions.ticks]]" 
+					value="[[selectedEngine.ngnoptions.engineOptions.ticks]]" 
+					required
+					auto-validate
+					hidden></paper-input>
+					
+				
+		
+			</form>
+		</iron-collapse>
+		
+		</div>
+	</paper-dialog-scrollable>
+	
+	
+<!-- 	<paper-button raised role="button" tabindex="0" animated="" -->
+<!-- 		aria-disabled="false" elevation="0" class="x-scope paper-button-0" -->
+<!-- 		on-tap="_getEngineOptions"> -->
+<!-- 	Get options</paper-button> -->
+		
+		
+	<div class="buttons">
+		<paper-button role="button" tabindex="0" animated=""
+			aria-disabled="false" elevation="0" class="x-scope paper-button-0"
+			on-tap="_getEngineOptions">Get options</paper-button>
+		
+		<paper-button dialog-dismiss="" role="button" tabindex="0" animated=""
+			aria-disabled="false" elevation="0" class="x-scope paper-button-0">Close</paper-button>
+			
+<!-- 		<paper-button dialog-confirm="" autofocus="" role="button" tabindex="0" -->
+<!-- 			animated="" aria-disabled="false" elevation="0" -->
+<!-- 			class="x-scope paper-button-0" -->
+<!-- 			disabled>Accept</paper-button> -->
+			
+	</div>
+	
+	</paper-dialog> 
+    
+    
+    
+
+  </template>
+
+	<script>
+	
+	
+	Polymer({
+
+		is: 'st-view-EngineOptions',
+
+		toast_ErrorMessage: String,
+		toast_Message: String,
+		
+//			selectedEngine : {
+//				type : Object
+//			},
+
+
+		viewOptions: {
+        	type: Object,
+        	value: function() {
+        		return {
+        			'refView': {}
+        		};
+        	}
+        },
+	        
+
+
+		properties: {
+			
+			selectedEngine: {
+	          type: Object,
+	          notify: true,
+	          reflectToAttribute: true,
+	          value: function() {
+	            return {
+	            	'type':'eee',
+	            	'engineid':'eee',
+	            	'engine': {},
+	            	'ngnoptions': {}
+	            };
+	          }
+	        }
+	        
+	    },
+	    
+	    
+	    observers: [
+	                
+                  	'_engineChanged(selectedEngine)',
+                  	'_engineChanged(selectedEngine.*)'
+                ],
+                
+        _engineChanged: function(changeRecord) {
+             console.log('path: ' + changeRecord.path);	// TODO REMOVE DEBUG LOG
+       		console.log('value: ' + changeRecord.value);	// TODO REMOVE DEBUG LOG
+        	console.log(changeRecord.value);	// TODO REMOVE DEBUG LOG
+             
+       	},
+       	
+       	
+       	showModal: function(options) {
+       		
+			console.log("_showModal"); // TODO REMOVE DEBUG LOG
+			
+			if (options === undefined) {
+				options = {};
+			}
+			
+			var _view = this;
+			var _viewOptions = _view.viewOptions;
+			var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
+			var _engineOptions = Polymer.dom(_view.root).querySelector('iron-collapse.hiddenSection[name="engineOptions"]');
+
+			
+			var _selectedEngine = _view.get('selectedEngine');
+			
+			console.log(_viewOptions); // TODO REMOVE DEBUG LOG
+			// console.log(_button.dataset); // TODO REMOVE DEBUG LOG
+			// console.log(_view.selectedEngine); // TODO REMOVE DEBUG LOG
+			
+	        
+	        // e.stopPropagation();
+	        
+			_view.async(function(){
+				_engineOptions.hide();
+				// _engineOptions_Dialog.fitInto = _viewOptions.refView;
+				_engineOptions_Dialog.positionTarget = _viewOptions.refView;
+				_engineOptions_Dialog.open();
+			}, 167);
+			
+			_view.async(function(){
+				// Notification required for binding to update!
+		        _view.notifyPath('selectedEngine.type', _selectedEngine.type);
+		        _view.notifyPath('selectedEngine.engine', _selectedEngine.engine);
+			}, 267);
+       		
+       	},	// endOf showModal
+       	
+       	
+       	
+       	
+		
+		_getEngineOptions: function(e, detail) {
+			
+			console.log("_getEngineOptions"); // TODO REMOVE DEBUG LOG
+			
+			var _view = this;
+			var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
+			var _selectedEngine = _view.get('selectedEngine');
+			var _engine = _selectedEngine.engine;
+			var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+			
+			var _toast_Error = _view.$.toast_Error;
+			var _toast_OK = _view.$.toast_OK;
+			var _engineOptions = Polymer.dom(_view.root).querySelector('iron-collapse.hiddenSection[name="engineOptions"]');
+
+			
+			var _scs_Request = null;
+			var _scs_RequestOptions = null;
+			
+			
+			e.stopPropagation();
+			
+
+			switch (_selectedEngine.type) {
+			
+				case 'sensor':
+					
+					_scs_Request = st_ConsoleApp.engines.sensors.get_SensorOptions;
+					_scs_RequestOptions = {
+							"consoleApp" : _consoleApp,
+							"sensorID": _selectedEngine.engine._sysID
+						};
+					
+					
+					
+					break;
+					
+				case 'actuator':
+					
+					_scs_Request = st_ConsoleApp.engines.actuators.get_ActuatorOptions;
+					_scs_RequestOptions = {
+							"consoleApp" : _consoleApp,
+							"actuatorID": _selectedEngine.engine._sysID
+						};
+					break;
+					
+				default:
+					break;
+			}
+			
+			if (_scs_Request === null) {
+				return;
+			}
+			
+			try {
+
+				_scs_Request(_scs_RequestOptions)
+						.then(function(data) {
+
+							console.log("st-view-EngineOptions._getEngineOptions - then..."); // TODO REMOVE DEBUG LOG
+							console.log(data); // TODO REMOVE DEBUG LOG
+							
+							_selectedEngine.ngnoptions =  data.options;
+							var _ngnOptions = _selectedEngine.ngnoptions;
+							
+							_view.async(function(){
+						        _view.notifyPath('selectedEngine.ngnoptions', _selectedEngine.ngnoptions);
+							}, 267);
+							
+							// Only edit options on some states
+							var _editEnabled = false;
+							if (_selectedEngine.engine.state === 'config' || 
+									_selectedEngine.engine.state === 'ready') {
+								_editEnabled = true;
+							}
+							
+									
+							switch (_engine.engine) {
+							
+								case 'STSensor_Dummy01':
+								case 'STActuator_Dummy01':
+									
+									var _ngnFormInput = {};
+									
+									_ngnFormInput.loopTime = Polymer.dom(_view.root)
+										.querySelector('#engineOptions_Dialog paper-input[name="loopTime"]');
+									
+									_ngnFormInput.showDeltaTime = Polymer.dom(_view.root)
+										.querySelector('#engineOptions_Dialog paper-checkbox[name="showDeltaTime"]');
+									
+									_ngnFormInput.showTime = Polymer.dom(_view.root)
+										.querySelector('#engineOptions_Dialog paper-checkbox[name="showTime"]');
+									
+									_ngnFormInput.ticks = Polymer.dom(_view.root)
+										.querySelector('#engineOptions_Dialog paper-input[name="ticks"]');
+
+
+									if (_ngnOptions.loopTime !== undefined) {
+										_ngnFormInput.loopTime.hidden = false;
+										_ngnFormInput.loopTime.disabled = !_editEnabled;
+									}
+									
+									if (_ngnOptions.engineOptions.showDeltaTime === true) {
+										
+										_ngnFormInput.showDeltaTime.checked = true;
+										_ngnFormInput.showDeltaTime.hidden = false;
+										_ngnFormInput.showDeltaTime.disabled = !_editEnabled;
+									}
+									
+									if (_ngnOptions.engineOptions.showTime === true) {
+										_ngnFormInput.showTime.checked = true;
+										_ngnFormInput.showTime.hidden = false;
+										_ngnFormInput.showTime.disabled = !_editEnabled;
+									}
+
+									if (_ngnOptions.engineOptions.showTime === true) {
+										_ngnFormInput.ticks.hidden = false;
+										_ngnFormInput.ticks.disabled = !_editEnabled;
+
+									}
+
+									
+									_view.async(function(){
+										_engineOptions.notifyResize();
+										_engineOptions.show();
+										// _engineOptions_Dialog.notifyResize();
+										_engineOptions_Dialog.refit();
+									}, 267);
+									
+									break;
+
+								default:
+									break;
+							}
+									
+							
+							// Show toast message
+							_toast_OK.close();
+							_view.toast_Message = "Engine options received...";
+							_toast_OK.fitInto = _engineOptions_Dialog;
+							_toast_OK.open();
+
+						},
+						function(error) {
+
+							// Show toast message
+							_toast_OK.close();
+							_view.toast_ErrorMessage = "Cannot get Engine options";
+							_toast_Error.fitInto = _engineOptions_Dialog;
+							_toast_Error.open();
+
+							console.log("st-view-EngineOptions._getEngineOptions - error..."); // TODO REMOVE DEBUG LOG
+							console.log(error); // TODO REMOVE DEBUG LOG
+						});
+
+			} catch (e) {
+				// TODO: handle exception
+				console.log("Error in Engine options"); // TODO REMOVE DEBUG LOG
+				console.log(e); // TODO REMOVE DEBUG LOG
+			}
+			
+			
+		},	// endOf _getEngineOptions
+	    
+
+
+	});
+	
+	
+	
+	</script>
+
+
+
+</dom-module>
+    

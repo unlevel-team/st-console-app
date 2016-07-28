@@ -44,6 +44,7 @@
  * @property {object} nodes - Nodes data
  * @property {object} engines - Engines data
  * @property {object} network - Network data
+ * @property {object} appElements - Apllication elements
  * 
  */
 class ConsoleApp {
@@ -67,6 +68,7 @@ class ConsoleApp {
 		consoleApp.config = null;
 		consoleApp.scsClient = null;
 		consoleApp.domEvents = null;
+		consoleApp.appElements = null;
 		
 		if (options.config === undefined) {
 			throw "config option is required";
@@ -108,6 +110,14 @@ class ConsoleApp {
 			// TODO: handle exception
 			throw "Cannot initialize DOM events. " + e;
 		}
+		
+		try {
+			consoleApp._init_appElements();
+		} catch (e) {
+			// TODO: handle exception
+			throw "Cannot initialize application elements. " + e;
+		}
+
 		
 	}
 	
@@ -200,6 +210,28 @@ class ConsoleApp {
 		let _document = _config.dom_Document;
 
 		_consoleApp.domEvents = _document.createElement("div");
+	}
+	
+	
+	/**
+	 * Initialize application elements
+	 * 
+	 * @private
+	 */
+	_init_appElements() {
+		
+		let _consoleApp = this;
+		let _config = _consoleApp.config;
+		
+		let _appElements = _consoleApp.appElements;
+		
+		
+		_appElements = {
+			"toast_OK": null,
+			"toast_Error": null
+				
+		};
+		
 	}
 	
 	

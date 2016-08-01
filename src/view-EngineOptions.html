@@ -10,6 +10,7 @@
 <link rel="import" href="../bower_components/paper-styles/shadow.html">
 
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
@@ -53,7 +54,7 @@
 		<div class="card">
 <!-- 		<form is="iron-form" id="engineOptions_Form"> -->
 			<p>
-			<b>type:</b> {{selectedEngine.type}}> <br>
+			<b>type:</b> {{selectedEngine.type}} <br>
 			<b>ID:</b> {{selectedEngine.engine._sysID}} <br>
 			<b>engine:</b> {{selectedEngine.engine.engine}}
 			</p>
@@ -82,12 +83,16 @@
 					required hidden
 					auto-validate></paper-input>
 				
-				<paper-checkbox name="showDeltaTime" hidden>
+				<paper-checkbox 
+					name="showDeltaTime" 
+					hidden>
 				  Show delta time
 				  <span class="subtitle">Diference between engine events</span>
 				</paper-checkbox>
 				
-				<paper-checkbox name="showTime" hidden>
+				<paper-checkbox 
+					name="showTime" 
+					hidden>
 				  Show current time
 				  <span class="subtitle">Current time</span>
 				</paper-checkbox>
@@ -100,7 +105,13 @@
 					auto-validate
 					hidden></paper-input>
 					
-				
+			  <paper-button raised 
+			  	id="button_saveOptions"
+			  	on-tap="_saveOptions_delayedSubmit" 
+			  	disabled>
+			    <paper-spinner id="button_saveOptionspinner" hidden></paper-spinner>
+			    Save
+			  </paper-button>
 		
 			</form>
 		</iron-collapse>
@@ -196,6 +207,114 @@
        	},
        	
        	
+        ready: function() {
+         	  
+    		// var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+    		var _view = this;
+    		
+    		_view._init_engineOptions_Form();
+        },
+       	
+       	
+        _init_engineOptions_Form: function() {
+      	  
+      	  var _view = this;
+      	  var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+      	  
+      	  var _form = _view.$.engineOptions_Form;
+      	  var _buttonSubmit = _view.$.button_saveOptions;
+      	  var _spinner = _view.$.button_saveOptionspinner;
+      	  
+		  var _selectedEngine = _view.get('selectedEngine');
+		  var _engine = _selectedEngine.engine;
+		  var _ngnOptions = _engine.ngnoptions;
+      	  
+      	  console.log("st-view-EngineOptions._init_engineOptions_Form");	// TODO REMOVE DEBUG LOG
+      	  
+      	  
+      	  _form.addEventListener('change', function(event) {
+      		    // Validate the entire form to see if we should enable the `Submit` button.
+      		    _buttonSubmit.disabled = !_form.validate();
+      		  });
+      	  
+      	  _form.addEventListener('iron-form-submit', function(event) {
+      		  
+      		  	event.preventDefault();
+      		  	event.stopPropagation();
+      		  	
+      		 	_formData = event.detail;
+    	      	
+    	      	_view._saveEngineOptions({
+    	      		"view": _view,
+    	      		"formData": _formData
+    	      	});
+
+      			
+      			console.log("st-view-EngineOptions.iron-form-submit");	// TODO REMOVE DEBUG LOG
+      			console.log(event.detail);	// TODO REMOVE DEBUG LOG
+      		    
+      		  });
+    		
+    		
+        },	// EndOf _init_engineOptions_Form
+        
+        
+        
+        _resetForm() {
+        	
+        	var _view = this;
+        	var _selectedEngine = _view.get('selectedEngine');
+			var _form = _view.$.engineOptions_Form;
+			var _buttonSubmit = _view.$.button_saveOptions;
+			
+			var _fields = [
+               	{ 
+               		'name': 'loopTime', 
+            	 	'element': 'paper-input' 
+           	 	},
+           	 	{ 
+           	 		'name': 'showDeltaTime', 
+                	'element': 'paper-checkbox' 
+                },
+           	 	{ 
+           	 		'name': 'showTime', 
+                	'element': 'paper-checkbox' 
+                },
+               	{ 
+               		'name': 'ticks', 
+            	 	'element': 'paper-input' 
+           	 	}
+
+            ];
+			
+			
+			// Only edit options on some states
+			var _editEnabled = false;
+			if (_selectedEngine.engine.state === 'config' || 
+					_selectedEngine.engine.state === 'ready') {
+				_editEnabled = true;
+			}
+
+			
+			_form.reset();
+			
+			_fields.forEach(function(_field, _i) {
+				
+				var _q = '#engineOptions_Dialog ' + _field.element + '[name="' + _field.name + '"]';
+				var _element = Polymer.dom(_view.root).querySelector(_q);
+				
+				_element.hidden = true;
+				_element.required = false;
+				_element.disabled = !_editEnabled;
+			});
+
+			_form.validate();
+			
+			_buttonSubmit.disabled = !_editEnabled;
+			
+        },	// endOf _resetForm
+       	
+       	
        	showModal: function(options) {
        		
 			console.log("_showModal"); // TODO REMOVE DEBUG LOG
@@ -234,9 +353,6 @@
        		
        	},	// endOf showModal
        	
-       	
-       	
-       	
 		
 		_getEngineOptions: function(e, detail) {
 			
@@ -248,6 +364,7 @@
 			var _engine = _selectedEngine.engine;
 			var _consoleApp = st_ConsoleApp.get_ConsoleApp();
 			
+			var _form = _view.$.engineOptions_Form;
 			var _toast_Error = _view.$.toast_Error;
 			var _toast_OK = _view.$.toast_OK;
 			var _engineOptions = Polymer.dom(_view.root).querySelector('iron-collapse.hiddenSection[name="engineOptions"]');
@@ -256,8 +373,11 @@
 			var _scs_Request = null;
 			var _scs_RequestOptions = null;
 			
+			if (e !== undefined) {
+				e.stopPropagation();
+			}
 			
-			e.stopPropagation();
+			_view._resetForm();
 			
 
 			switch (_selectedEngine.type) {
@@ -302,6 +422,7 @@
 							_selectedEngine.ngnoptions =  data.options;
 							var _ngnOptions = _selectedEngine.ngnoptions;
 							
+							
 							_view.async(function(){
 						        _view.notifyPath('selectedEngine.ngnoptions', _selectedEngine.ngnoptions);
 							}, 267);
@@ -313,16 +434,22 @@
 								_editEnabled = true;
 							}
 							
+							
+							var _ngnFormInput = {};
+							
+							_ngnFormInput.loopTime = Polymer.dom(_view.root)
+								.querySelector('#engineOptions_Dialog paper-input[name="loopTime"]');
+							
+							if (_ngnOptions.loopTime !== undefined) {
+								_ngnFormInput.loopTime.hidden = false;
+								_ngnFormInput.loopTime.disabled = !_editEnabled;
+							}
+							
 									
 							switch (_engine.engine) {
 							
 								case 'STSensor_Dummy01':
 								case 'STActuator_Dummy01':
-									
-									var _ngnFormInput = {};
-									
-									_ngnFormInput.loopTime = Polymer.dom(_view.root)
-										.querySelector('#engineOptions_Dialog paper-input[name="loopTime"]');
 									
 									_ngnFormInput.showDeltaTime = Polymer.dom(_view.root)
 										.querySelector('#engineOptions_Dialog paper-checkbox[name="showDeltaTime"]');
@@ -333,38 +460,22 @@
 									_ngnFormInput.ticks = Polymer.dom(_view.root)
 										.querySelector('#engineOptions_Dialog paper-input[name="ticks"]');
 
-
-									if (_ngnOptions.loopTime !== undefined) {
-										_ngnFormInput.loopTime.hidden = false;
-										_ngnFormInput.loopTime.disabled = !_editEnabled;
-									}
-									
 									if (_ngnOptions.engineOptions.showDeltaTime === true) {
 										
 										_ngnFormInput.showDeltaTime.checked = true;
-										_ngnFormInput.showDeltaTime.hidden = false;
-										_ngnFormInput.showDeltaTime.disabled = !_editEnabled;
 									}
+									_ngnFormInput.showDeltaTime.hidden = false;
+									_ngnFormInput.showDeltaTime.disabled = !_editEnabled;
+
 									
 									if (_ngnOptions.engineOptions.showTime === true) {
 										_ngnFormInput.showTime.checked = true;
-										_ngnFormInput.showTime.hidden = false;
-										_ngnFormInput.showTime.disabled = !_editEnabled;
 									}
+									_ngnFormInput.showTime.hidden = false;
+									_ngnFormInput.showTime.disabled = !_editEnabled;
 
-									if (_ngnOptions.engineOptions.showTime === true) {
-										_ngnFormInput.ticks.hidden = false;
-										_ngnFormInput.ticks.disabled = !_editEnabled;
-
-									}
-
-									
-									_view.async(function(){
-										_engineOptions.notifyResize();
-										_engineOptions.show();
-										// _engineOptions_Dialog.notifyResize();
-										_engineOptions_Dialog.refit();
-									}, 267);
+									_ngnFormInput.ticks.hidden = false;
+									_ngnFormInput.ticks.disabled = !_editEnabled;
 									
 									break;
 
@@ -372,6 +483,16 @@
 									break;
 							}
 									
+							
+							
+							_view.async(function(){
+								_engineOptions.notifyResize();
+								_engineOptions.show();
+								// _engineOptions_Dialog.notifyResize();
+								_engineOptions_Dialog.refit();
+								_form.validate();
+							}, 267);
+							
 							
 							// Show toast message
 							_toast_OK.close();
@@ -388,6 +509,7 @@
 							_toast_Error.fitInto = _engineOptions_Dialog;
 							_toast_Error.open();
 
+							
 							console.log("st-view-EngineOptions._getEngineOptions - error..."); // TODO REMOVE DEBUG LOG
 							console.log(error); // TODO REMOVE DEBUG LOG
 						});
@@ -401,10 +523,249 @@
 			
 		},	// endOf _getEngineOptions
 	    
+		
+		
+		_saveEngineOptions: function(options) {
+			
+			if (options === undefined) {
+				options = {};
+			}
+			
+			if (options.view === undefined) {
+				options.view = this;
+			}
+			var _view = options.view;
+			
+			if (options.formData === undefined) {
+				return;
+			}
+			var _formData = options.formData;
+			
+      		
+      	  	var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+      	  
+			var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
+      	  	var _form = _view.$.engineOptions_Form;
+      	  	var _buttonSubmit = _view.$.button_saveOptions;
+      	  	var _spinner = _view.$.button_saveOptionspinner;
+			var _toast_Error = _view.$.toast_Error;
+			var _toast_OK = _view.$.toast_OK;
 
+      	  
+		  	var _selectedEngine = _view.get('selectedEngine');
+		  	var _engine = _selectedEngine.engine;
+		  	var _ngnOptions = _selectedEngine.ngnoptions;
+
+
+		  	// console.log("st-view-EngineOptions._saveEngineOptions");	// TODO REMOVE DEBUG LOG
+	      	// console.log(_selectedEngine);	// TODO REMOVE DEBUG LOG
+	      	// console.log(_engine);	// TODO REMOVE DEBUG LOG
+	      	// console.log(_ngnOptions);	// TODO REMOVE DEBUG LOG
+	      	// console.log(_formData);	// TODO REMOVE DEBUG LOG
+
+			var _ngnOptionsData = {};
+			var _requestDATA = {};
+			
+			// 'loopTime' option
+			if (_ngnOptions.loopTime !== undefined) {
+				_ngnOptionsData.loopTime = _ngnOptions.loopTime;
+				if (_formData.loopTime !== undefined) {
+					_ngnOptionsData.loopTime = _formData.loopTime
+				}
+			}
+			
+			
+			switch (_engine.engine) {
+			
+		  		case 'STSensor_Dummy01':
+				case 'STActuator_Dummy01':
+				
+					var _ngnOptionsCustom = _ngnOptions.engineOptions;
+					
+					_ngnOptionsData.engineOptions = {};
+					var _ngnOpsDataCustom = _ngnOptionsData.engineOptions;
+					
+					// 'showDeltaTime' option
+					if (_ngnOptionsCustom.showDeltaTime !== undefined) {
+						_ngnOpsDataCustom.showDeltaTime = _ngnOptionsCustom.showDeltaTime;
+						if (_formData.showDeltaTime !== undefined) {
+							switch (_formData.showDeltaTime) {
+								case 'on':
+									_ngnOpsDataCustom.showDeltaTime = true;
+									break;
+	
+								default:
+									_ngnOpsDataCustom.showDeltaTime = false;
+									break;
+							}
+						} else {
+							_ngnOpsDataCustom.showDeltaTime = false;
+						}
+					}
+
+					// 'showTime' option
+					if (_ngnOptionsCustom.showTime !== undefined) {
+						_ngnOpsDataCustom.showTime = _ngnOptionsCustom.showTime;
+						if (_formData.showTime !== undefined) {
+							switch (_formData.showTime) {
+								case 'on':
+									_ngnOpsDataCustom.showTime = true;
+									break;
+	
+								default:
+									_ngnOpsDataCustom.showTime = false;
+									break;
+							}
+						} else {
+							_ngnOpsDataCustom.showTime = false;
+						}
+					}
+					
+					
+					// 'ticks' option
+					if (_ngnOptionsCustom.ticks !== undefined) {
+						_ngnOpsDataCustom.ticks = _ngnOptionsCustom.ticks;
+						if (_formData.ticks !== undefined) {
+							_ngnOpsDataCustom.ticks = _formData.ticks;
+						}
+					}
+
+				
+					break;
+	
+				default:
+					break;
+			}
+			  	
+			
+			
+			
+			var _scs_Request = null;
+			var _scs_RequestOptions = null;
+			
+			
+			switch (_selectedEngine.type) {
+			
+				case 'sensor':
+					
+					_scs_Request = st_ConsoleApp.engines.sensors.set_SensorOptions;
+					_scs_RequestOptions = {
+							"consoleApp" : _consoleApp,
+							"sensorID": _selectedEngine.engine._sysID,
+							"sensorOptions": _ngnOptionsData
+						};
+					
+					break;
+					
+				case 'actuator':
+					
+					_scs_Request = st_ConsoleApp.engines.actuators.set_ActuatorOptions;
+					_scs_RequestOptions = {
+							"consoleApp" : _consoleApp,
+							"actuatorID": _selectedEngine.engine._sysID,
+							"actuatorOptions": _ngnOptionsData
+						};
+					break;
+					
+				default:
+					break;
+			}
+			
+			if (_scs_Request === null) {
+				return;
+			}
+
+			
+		    
+			try {
+
+				_scs_Request(_scs_RequestOptions)
+						.then(function(data) {
+
+							console.log("st-view-EngineOptions._saveEngineOptions - then..."); // TODO REMOVE DEBUG LOG
+							console.log(data); // TODO REMOVE DEBUG LOG
+							
+							_selectedEngine.ngnoptions =  data.options;
+							
+							_view.async(function(){
+							  	_spinner.active = false;
+							  	_spinner.hidden = true;
+							  	_buttonSubmit.disabled = false;
+							  	
+						        _view.notifyPath('selectedEngine.ngnoptions', _selectedEngine.ngnoptions);
+
+							  	// _view._getEngineOptions();
+
+							}, 567);
+							
+							
+							// Show toast message
+							_toast_OK.close();
+							_view.toast_Message = "Engine options saved...";
+							_toast_OK.fitInto = _engineOptions_Dialog;
+							_toast_OK.open();
+
+						},
+						function(error) {
+
+							// Show toast message
+							_toast_OK.close();
+							_view.toast_ErrorMessage = "Cannot save Engine options";
+							_toast_Error.fitInto = _engineOptions_Dialog;
+							_toast_Error.open();
+							
+							_view.async(function(){
+							  	_spinner.active = false;
+							  	_spinner.hidden = true;
+							  	_buttonSubmit.disabled = false;
+							  	
+						        _view.notifyPath('selectedEngine.ngnoptions', _selectedEngine.ngnoptions);
+							  	
+							  	// _view._getEngineOptions();
+
+							}, 567);
+
+							
+							console.log("st-view-EngineOptions._saveEngineOptions - error..."); // TODO REMOVE DEBUG LOG
+							console.log(error); // TODO REMOVE DEBUG LOG
+						});
+
+			} catch (e) {
+				// TODO: handle exception
+				console.log("Error saving Engine options"); // TODO REMOVE DEBUG LOG
+				console.log(e); // TODO REMOVE DEBUG LOG
+			}
+			
+			
+			
+		},	// endOf _saveEngineOptions
+
+		
+		_saveOptions_delayedSubmit: function(event) {
+	  	  
+	  	  var _view = this;
+	  	  var _consoleApp = st_ConsoleApp.get_ConsoleApp();
+	  	  var _spinner = _view.$.button_saveOptionspinner;
+	  	  var _buttonSubmit = _view.$.button_saveOptions;
+	  	  var _form = _view.$.engineOptions_Form;
+	  	  
+	  	  _spinner.active = true;
+	  	  _spinner.hidden = false;
+	  	  _buttonSubmit.disabled = true;
+	  	  
+		  	  // Simulate a slow server response.
+		  	  setTimeout(function() {
+		  		  
+		  	 	 _form.submit();
+		  	  
+		  	  }, 1000);
+		  	  
+		  	  
+	    }  // endOf _saveOptions_delayedSubmit
 
 	});
 	
+
 	
 	
 	</script>

@@ -163,6 +163,58 @@ function get_ActuatorOptions(options) {
 
 
 /**
+ * Set Actuator Options
+ * 
+ * @memberof st.consoleApp.engines.actuators
+ * @public
+ * 
+ * @param {object} options - Options
+ * @param {st.consoleApp.ConsoleApp} options.consoleApp - Console App reference
+ * @param {string} options.actuatorID - Actuator ID
+ * @param {object} options.actuatorOptions - Actuator options
+ * 
+ * @returns {Promise}
+ * 
+ */
+function set_ActuatorOptions(options) {
+	
+	let _consoleApp = options.consoleApp;
+	let _SCSRequestsForEngines = _consoleApp.engines.SCS_Requests;
+	
+	
+	let promise = new Promise(function(resolve, reject) {
+		
+		_SCSRequestsForEngines.set_ActuatorOptions({
+			
+			"scsClient": _consoleApp.scsClient,
+			"actuatorID": options.actuatorID,
+			"actuatorOptions": options.actuatorOptions,
+
+			
+			"_onComplete": function(data) {
+				
+
+			}
+		
+		}).then(function(value) {
+			
+			
+			resolve(value);
+			
+		}, function(reason) {
+			
+			console.log("<~i~> st.consoleApp.engines.actuators.set_ActuatorOptions.error");	// TODO REMOVE DEBUG LOG
+			console.log(reason);	// TODO REMOVE DEBUG LOG
+			reject(Error("It broke"));
+		});
+		
+	});
+	
+	return promise;
+}
+
+
+/**
  * Start Actuator
  * 
  * @memberof st.consoleApp.engines.actuators
@@ -262,6 +314,7 @@ let _lib = {
 	"get_ActuatorsList": get_ActuatorsList,
 	"get_ActuatorInfo": get_ActuatorInfo,
 	"get_ActuatorOptions": get_ActuatorOptions,
+	"set_ActuatorOptions": set_ActuatorOptions,
 	"start_Actuator": start_Actuator,
 	"stop_Actuator": stop_Actuator,
 	
@@ -269,6 +322,7 @@ let _lib = {
 		"get_ActuatorsList": get_ActuatorsList,
 		"get_ActuatorInfo": get_ActuatorInfo,
 		"get_ActuatorOptions": get_ActuatorOptions,
+		"set_ActuatorOptions": set_ActuatorOptions,
 		"start_Actuator": start_Actuator,
 		"stop_Actuator": stop_Actuator
 	}

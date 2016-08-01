@@ -171,6 +171,58 @@ function get_SensorOptions(options) {
 
 
 /**
+ * Set Sensor Options
+ * 
+ * @memberof st.consoleApp.engines.sensors
+ * @public
+ * 
+ * @param {object} options - Options
+ * @param {st.consoleApp.ConsoleApp} options.consoleApp - Console App reference
+ * @param {string} options.sensorID - Sensor ID
+ * @param {object} options.sensorOptions - Sensor options
+ * 
+ * @returns {Promise}
+ * 
+ */
+function set_SensorOptions(options) {
+	
+	let _consoleApp = options.consoleApp;
+	let _SCSRequestsForEngines = _consoleApp.engines.SCS_Requests;
+	
+	
+	let promise = new Promise(function(resolve, reject) {
+		
+		_SCSRequestsForEngines.set_SensorOptions({
+			
+			"scsClient": _consoleApp.scsClient,
+			"sensorID": options.sensorID,
+			"sensorOptions": options.sensorOptions,
+
+			
+			"_onComplete": function(data) {
+				
+
+			}
+		
+		}).then(function(value) {
+			
+			
+			resolve(value);
+			
+		}, function(reason) {
+			
+			console.log("<~i~> st.consoleApp.engines.sensors.set_SensorOptions.error");	// TODO REMOVE DEBUG LOG
+			console.log(reason);	// TODO REMOVE DEBUG LOG
+			reject(Error("It broke"));
+		});
+		
+	});
+	
+	return promise;
+}
+
+
+/**
  * Start Sensor
  * 
  * @memberof st.consoleApp.engines.sensors
@@ -272,6 +324,7 @@ let _lib = {
 	"get_SensorsList": get_SensorsList,
 	"get_SensorInfo": get_SensorInfo,
 	"get_SensorOptions": get_SensorOptions,
+	"set_SensorOptions": set_SensorOptions,
 	"start_Sensor": start_Sensor,
 	"stop_Sensor": stop_Sensor,
 	
@@ -279,6 +332,7 @@ let _lib = {
 		"get_SensorsList": get_SensorsList,
 		"get_SensorInfo": get_SensorInfo,
 		"get_SensorOptions": get_SensorOptions,
+		"set_SensorOptions": set_SensorOptions,
 		"start_Sensor": start_Sensor,
 		"stop_Sensor": stop_Sensor
 	}

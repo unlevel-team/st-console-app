@@ -103,9 +103,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		  		placeholder="[[controlPort]]"
 		  		value="[[controlPort]]"
 		  		required auto-validate></paper-input>
+		  		
 <!-- 		  <paper-checkbox name="read" required>You must check this box</paper-checkbox><br> -->
-		  <paper-button raised on-click="form_delayedSubmit" disabled id="eventsDemoSubmit">
-		    <paper-spinner id="spinner" hidden></paper-spinner>Save</paper-button>
+		  
+		  <paper-button raised 
+		  	id="eventsDemoSubmit"
+		  	on-click="form_delayedSubmit" 
+		  	disabled>
+		  	
+		    <paper-spinner id="spinner" hidden></paper-spinner>
+		    Save
+		  </paper-button>
+		  
 		  <paper-button raised on-tap="form_reset">Reset</paper-button>
 		  <paper-button raised on-tap="form_Hide">Cancel</paper-button>
 		  <div class="output"></div>
@@ -140,6 +149,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 		_view.netLocation = _consoleApp.config.scs.netLocation;
 		_view.controlPort = _consoleApp.config.scs.controlPort;
     	
+		
+  		_consoleApp.domEvents.addEventListener('configChanged', function(event) {
+		    
+	    	  console.log("st-view-ServerInfo.configChanged");	// TODO REMOVE DEBUG LOG
+	    	  console.log(event);	// TODO REMOVE DEBUG LOG
+	    	  
+	    	  _view.netLocation = _consoleApp.config.scs.netLocation;
+	  		  _view.controlPort = _consoleApp.config.scs.controlPort;
+	  		  
+	  		_view.form_Hide();
+	  		
+		  });
+
+		
 		_view._init_form();
 		
       },
@@ -153,8 +176,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     	  var _buttonSubmit = this.$.eventsDemoSubmit;
     	  var _spinner = this.$.spinner;
     	  
-    	  console.log("st-view-ServerInfo._init_form");	// TODO REMOVE DEBUG LOG
-    	  
     	  _form.addEventListener('change', function(event) {
     		    // Validate the entire form to see if we should enable the `Submit` button.
     		    _buttonSubmit.disabled = !_form.validate();
@@ -162,9 +183,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     	  
     	  _form.addEventListener('iron-form-submit', function(event) {
     		  
-        	  var _view = this;
-        	  var _consoleApp = st_ConsoleApp.get_ConsoleApp();
-        	  
     		  	event.preventDefault();
     		  	event.stopPropagation();
     		  	
@@ -186,30 +204,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        	  			}
     		    };
     		    
-    			
 //     			console.log("st-view-ServerInfo.iron-form-submit");	// TODO REMOVE DEBUG LOG
-//     			console.log(event.detail);	// TODO REMOVE DEBUG LOG 
-//     			console.log(_formContent);	// TODO REMOVE DEBUG LOG    		    
-//     			console.log(_config);	// TODO REMOVE DEBUG LOG    		    
     		    
     	  		_consoleApp.changeConfig(_config);
     	  		
     		    
     		  });
     	  
-  		_consoleApp.domEvents.addEventListener('configChanged', function(event) {
-		    // Validate the entire form to see if we should enable the `Submit` button.
-// 		    _buttonSubmit.disabled = !_form.validate();
-		    
-	    	  console.log("st-view-ServerInfo.configChanged");	// TODO REMOVE DEBUG LOG
-	    	  console.log(event);	// TODO REMOVE DEBUG LOG
-	    	  
-	    	  _view.netLocation = _consoleApp.config.scs.netLocation;
-	  		  _view.controlPort = _consoleApp.config.scs.controlPort;
-	  		  
-	  		_view.form_Hide();
-	  		
-		  });
   		
   		
       },

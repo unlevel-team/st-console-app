@@ -14,7 +14,7 @@ module.exports = function(grunt) {
         dev: {
             options: {
                 src: "./../NLVL_STforBrowser/dist/",
-                dest: "./bower_components/st.forbrowser/dist/",
+                dest: "./bower_components/st-forbrowser/dist/",
                 delete: true
             }
         }

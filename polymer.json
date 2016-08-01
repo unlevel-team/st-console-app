@@ -5,6 +5,7 @@
     "src/st-view-NodesList.html",
     "src/st-view-ServerInfo.html",
     "src/st-view-EnginesList.html",
+    "src/view-EngineOptions.html",
     "src/st-view-NetList.html"
   ]
 }

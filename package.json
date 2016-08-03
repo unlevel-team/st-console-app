@@ -1,6 +1,6 @@
 {
   "name": "st-console-app",
-  "version": "0.0.1-beta00-build006",
+  "version": "0.0.1-beta00-build007",
   "description": "ST Console App",
   "author": "Unlevel Team <unlevelteam@gmail.com>",
   "main": "index.html",
@@ -25,7 +25,8 @@
     "Gruntfile.js",
     "bower.json",
     "polymer.json",
-    "manifest.json"
+    "manifest.json",
+    "robots.txt"
   ],
           
   "scripts": {

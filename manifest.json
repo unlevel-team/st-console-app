@@ -1,5 +1,6 @@
 {
   "name": "SomeThings Console Application",
+  "manifest_version": 2,
   "short_name": "ST Console App",
     "icons": [{
       "src": "images/app-icon-32.png",

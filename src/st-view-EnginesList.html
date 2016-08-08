@@ -235,6 +235,7 @@
                   	'engineChanged(sensors.*)',
                   	'engineChanged(actuators.*)'
                 ],
+                
                 engineChanged: function(changeRecord) {
                 	console.log('path: ' + changeRecord.path);	// TODO REMOVE DEBUG LOG
 			        console.log('value: ' + changeRecord.value);	// TODO REMOVE DEBUG LOG
@@ -382,17 +383,20 @@
 					var _toast_OK = _view.$.toast_OK;
 					
 					var _toastRef = null;
-					var _scs_Request = null;
-					var _scs_RequestOptions = null;
+					var _ngntype = null;
+
 					
 					switch (_type) {
+						
 						case 'sensor':
-							_scs_Request = st_ConsoleApp.engines.sensors.get_SensorsList;
+							// _scs_Request = st_ConsoleApp.engines.sensors.get_SensorsList;
+							_ngntype = 'sensors';
 							_toastRef = _view.$.list_SensorsHeader;
 							break;
 							
 						case 'actuator':
-							_scs_Request = st_ConsoleApp.engines.actuators.get_ActuatorsList;
+							// _scs_Request = st_ConsoleApp.engines.actuators.get_ActuatorsList;
+							_ngntype = 'actuators';
 							_toastRef = _view.$.list_ActuatorsHeader;
 							break;
 	
@@ -400,14 +404,16 @@
 							break;
 					}
 					
-					if (_scs_Request === null) {
+					if (_ngntype === null) {
 						return;
 					}
 					
 					try {
 						
-						_scs_RequestOptions = {
-								"consoleApp" : _consoleApp
+						var _scs_Request = st_ConsoleApp.engines.scsRequests.get_EnginesList;
+						var _scs_RequestOptions = {
+								'consoleApp' : _consoleApp,
+								'ngntype': _ngntype
 						};
 
 						_scs_Request(_scs_RequestOptions)
@@ -507,111 +513,6 @@
 				},	// enfOf _engineSettings
 				
 				
-				_getEngineOptions: function(e, detail) {
-					
-					console.log("_getEngineOptions"); // TODO REMOVE DEBUG LOG
-					
-					var _view = this;
-					var _selectedEngine = _view.get('selectedEngine');
-					var _consoleApp = st_ConsoleApp.get_ConsoleApp();
-					
-					var _engineOptions_Dialog = _view.$.engineOptions_Dialog;
-					var _toast_Error = _view.$.toast_Error;
-					var _toast_OK = _view.$.toast_OK;
-					
-					var _scs_Request = null;
-					var _scs_RequestOptions = null;
-					
-
-					switch (_selectedEngine.type) {
-					
-						case 'sensor':
-							
-							_scs_Request = st_ConsoleApp.engines.sensors.get_SensorOptions;
-							_scs_RequestOptions = {
-									"consoleApp" : _consoleApp,
-									"sensorID": _selectedEngine.engine._sysID
-								};
-							
-							
-							
-							break;
-							
-						case 'actuator':
-							
-							_scs_Request = st_ConsoleApp.engines.actuators.get_ActuatorOptions;
-							_scs_RequestOptions = {
-									"consoleApp" : _consoleApp,
-									"actuatorID": _selectedEngine.engine._sysID
-								};
-							break;
-							
-						default:
-							break;
-					}
-					
-					if (_scs_Request === null) {
-						return;
-					}
-					
-					try {
-
-						_scs_Request(_scs_RequestOptions)
-								.then(function(data) {
-
-									console.log("st-view-EnginesList._getEngineOptions - then..."); // TODO REMOVE DEBUG LOG
-									console.log(data); // TODO REMOVE DEBUG LOG
-
-									switch (_selectedEngine.type) {
-										case 'sensor':
-											
-											switch (_selectedEngine.engine) {
-												case 'STSensor_Dummy01':
-													
-													break;
-	
-												default:
-													break;
-											}
-											
-											
-											
-											break;
-	
-										default:
-											break;
-									}
-									
-									
-									// Show toast message
-									_toast_OK.close();
-									_view.toast_Message = "Engine options received...";
-									_toast_OK.fitInto = _engineOptions_Dialog;
-									_toast_OK.open();
-
-								},
-								function(error) {
-	
-									// Show toast message
-									_toast_OK.close();
-									_view.toast_ErrorMessage = "Cannot get Engine options";
-									_toast_Error.fitInto = _engineOptions_Dialog;
-									_toast_Error.open();
-	
-									console.log("st-view-EnginesList._getEngineOptions - error..."); // TODO REMOVE DEBUG LOG
-									console.log(error); // TODO REMOVE DEBUG LOG
-								});
-
-					} catch (e) {
-						// TODO: handle exception
-						console.log("Error in Engine options"); // TODO REMOVE DEBUG LOG
-						console.log(e); // TODO REMOVE DEBUG LOG
-					}
-					
-					
-				},	// endOf _getEngineOptions
-				
-				
 				_engineDetail: function(options){
 					
 					var _view = this;
@@ -622,20 +523,16 @@
 					var _model = options.model;
 					
 					var _scs_Request = null;
-					var _scs_RequestOptions = null;
 					var _ngnList = null;
 					var _ngnListView = null;
 					
+					var _ngntype = null;
 					
 					switch (_type) {
 					
 						case 'sensor':
 							
-							_scs_Request = st_ConsoleApp.engines.sensors.get_SensorInfo;
-							_scs_RequestOptions = {
-								"consoleApp" : _consoleApp,
-								"sensorID": _engineID
-							};
+							_ngntype = 'sensors';
 						
 							_ngnListView = _view.$.listForSensors;
 							_ngnListViewStr = 'listForSensors';
@@ -647,11 +544,7 @@
 							
 						case 'actuator':
 							
-							_scs_Request = st_ConsoleApp.engines.actuators.get_ActuatorInfo;
-							_scs_RequestOptions = {
-								"consoleApp" : _consoleApp,
-								"actuatorID": _engineID
-							};
+							_ngntype = 'actuators';
 							
 							_ngnListView = _view.$.listForActuators;
 							_ngnListViewStr = 'listForActuators';
@@ -665,7 +558,7 @@
 							break;
 					}
 					
-					if (_scs_Request === null) {
+					if (_ngntype === null) {
 						return;
 					}
 					
@@ -681,6 +574,13 @@
 					
 					
 					try {
+
+						var _scs_Request = st_ConsoleApp.engines.scsRequests.get_EngineInfo;
+						var _scs_RequestOptions = {
+							'consoleApp': _consoleApp,
+							'ngntype': _ngntype,
+							'ngnID': _engineID
+						};
 
 						_scs_Request( _scs_RequestOptions )
 								.then(function(data) {
@@ -768,68 +668,29 @@
 					var _command = command;
 					var _engineID = _item._sysID;
 					
-					var _scs_Request = null;
-					var _scs_RequestOptions = null;
 					var _enginesList = null;
 					var _notifyPath = null;
-					
-					
-					console.log(_item); // TODO REMOVE DEBUG LOG
-					console.log(_command); // TODO REMOVE DEBUG LOG
+					var _ngntype = null;
 
-					
-					
 					
 					switch (_type) {
 					
 						case 'sensor':	// Sensor engine
 							
-							_scs_RequestOptions = {
-								"consoleApp" : _consoleApp,
-								"sensorID": _engineID
-							};
+							_ngntype = 'sensors';
 						
 							_enginesList = _view.$.listForSensors.items;
 							_notifyPath = 'listForSensors.list';
-							
-							switch (_command) {
-								case 'start':
-									_scs_Request = st_ConsoleApp.engines.sensors.start_Sensor;
-									break;
-	
-								case 'stop':
-									_scs_Request = st_ConsoleApp.engines.sensors.stop_Sensor;
-									break;
-									
-								default:
-									break;
-							}
 							
 							break;
 							
 							
 						case 'actuator':	// Actuator engine
 						
-							_scs_RequestOptions = {
-								"consoleApp" : _consoleApp,
-								"actuatorID": _engineID
-							};
+							_ngntype = 'actuators';
 						
 							_enginesList = _view.$.listForActuators.items;
 							_notifyPath = 'listForActuators.list';
-							
-							switch (_command) {
-								case 'start':
-									_scs_Request = st_ConsoleApp.engines.actuators.start_Actuator;
-									break;
-	
-								case 'stop':
-									_scs_Request = st_ConsoleApp.engines.actuators.stop_Actuator;
-									break;
-									
-								default:
-									break;
-							}
 							
 							break;
 							
@@ -838,9 +699,19 @@
 					}
 					
 					
+					switch (_command) {
+						case 'start':
+						case 'stop':
+							break;
+							
+						default:
+							throw 'Bad command.';
+							break;
+					}
+
 					
-					if (_scs_Request === null) {
-						console.log("No _scs_Request"); // TODO REMOVE DEBUG LOG
+					
+					if (_ngntype === null) {
 						return;
 					}
 					
@@ -857,7 +728,15 @@
 					
 					
 					try {
-
+						
+						var _scs_Request = st_ConsoleApp.engines.scsRequests.control_Engine;
+						var _scs_RequestOptions = {
+								'consoleApp' : _consoleApp,
+								'ngntype': _ngntype,
+								'ngnID': _engineID,
+								'ctrlCommand': _command
+							};
+						
 						_scs_Request( _scs_RequestOptions )
 								.then(function(data) {
 
@@ -916,6 +795,7 @@
 					
 				},	// endOf _engineStart
 				
+				
 				_engineStop: function(e, detail) {
 					
 					var _view = this;
@@ -927,6 +807,9 @@
 				}	// endOf _engineStop
 
 			});
+			
+			
+			
 		</script>
 
 </dom-module>

@@ -54,9 +54,9 @@
 
 
 <!--  Engine options dialog -->
-	<paper-dialog id="engineOptions_Dialog" role="dialog" tabindex="-1"
+	<paper-dialog id="engineOptions_Dialog"
+		role="dialog" 
 		aria-hidden="true" 
-		class="x-scope paper-dialog-0"
 		style="outline: none; display: none;">
 	
 	
@@ -354,9 +354,11 @@
 	        
 			_view.async(function(){
 				_engineOptions.hide();
-				// _engineOptions_Dialog.fitInto = _viewOptions.refView;
-				_engineOptions_Dialog.positionTarget = _viewOptions.refView;
+				_engineOptions_Dialog.fitInto = _viewOptions.refView;
+				// _engineOptions_Dialog.positionTarget = _viewOptions.refView;
+				// _engineOptions_Dialog.alwaysOnTop = true;
 				_engineOptions_Dialog.open();
+				
 			}, 167);
 			
 			_view.async(function(){
@@ -386,6 +388,8 @@
 			
 			var _scs_Request = null;
 			var _scs_RequestOptions = null;
+			var _ngntype = null;
+
 			
 			if (e !== undefined) {
 				e.stopPropagation();
@@ -397,35 +401,29 @@
 			switch (_selectedEngine.type) {
 			
 				case 'sensor':
-					
-					_scs_Request = st_ConsoleApp.engines.sensors.get_SensorOptions;
-					_scs_RequestOptions = {
-							"consoleApp" : _consoleApp,
-							"sensorID": _selectedEngine.engine._sysID
-						};
-					
-					
-					
+					_ngntype = 'sensors';
 					break;
 					
 				case 'actuator':
-					
-					_scs_Request = st_ConsoleApp.engines.actuators.get_ActuatorOptions;
-					_scs_RequestOptions = {
-							"consoleApp" : _consoleApp,
-							"actuatorID": _selectedEngine.engine._sysID
-						};
+					_ngntype = 'actuators';
 					break;
 					
 				default:
 					break;
 			}
 			
-			if (_scs_Request === null) {
+			if (_ngntype === null) {
 				return;
 			}
 			
 			try {
+				
+				var _scs_Request = st_ConsoleApp.engines.scsRequests.get_EngineOptions;
+				var _scs_RequestOptions = {
+						"consoleApp" : _consoleApp,
+						'ngntype': _ngntype,
+						'ngnID': _engine._sysID
+				};
 
 				_scs_Request(_scs_RequestOptions)
 						.then(function(data) {
@@ -654,38 +652,46 @@
 			
 			
 			
-			var _scs_Request = null;
-			var _scs_RequestOptions = null;
-			
+			// var _scs_Request = null;
+			// var _scs_RequestOptions = null;
+			var _ngntype = null;
+
 			
 			switch (_selectedEngine.type) {
 			
 				case 'sensor':
-					
+					/*
 					_scs_Request = st_ConsoleApp.engines.sensors.set_SensorOptions;
 					_scs_RequestOptions = {
 							"consoleApp" : _consoleApp,
 							"sensorID": _selectedEngine.engine._sysID,
 							"sensorOptions": _ngnOptionsData
 						};
+					*/
+					
+					_ngntype = 'sensors';
 					
 					break;
 					
 				case 'actuator':
-					
+					/*
 					_scs_Request = st_ConsoleApp.engines.actuators.set_ActuatorOptions;
 					_scs_RequestOptions = {
 							"consoleApp" : _consoleApp,
 							"actuatorID": _selectedEngine.engine._sysID,
 							"actuatorOptions": _ngnOptionsData
 						};
+					*/
+					
+					_ngntype = 'actuators';
+
 					break;
 					
 				default:
 					break;
 			}
 			
-			if (_scs_Request === null) {
+			if (_ngntype === null) {
 				return;
 			}
 
@@ -693,6 +699,15 @@
 		    
 			try {
 
+				var _scs_Request = st_ConsoleApp.engines.scsRequests.set_EngineOptions;
+				var _scs_RequestOptions = {
+						'consoleApp' : _consoleApp,
+						'ngntype': _ngntype,
+						'ngnID': _engine._sysID,
+						'ngnOptions': _ngnOptionsData
+					};
+
+				
 				_scs_Request(_scs_RequestOptions)
 						.then(function(data) {
 

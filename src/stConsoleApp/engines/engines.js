@@ -13,18 +13,15 @@
  * 
  */
 
+let _scsRequests = require('./scsRequests.js');
 
-let sensors_Lib = require('./sensors.js');
-let actuators_Lib = require('./actuators.js');
 
 let _lib = {
 		
-	"sensors": sensors_Lib,
-	"actuators": actuators_Lib,
+	"scsRequests": _scsRequests,
 	
 	"_public": {
-		"sensors": sensors_Lib._public,
-		"actuators": actuators_Lib._public,
+		"scsRequests": _scsRequests._public
 	}
 		
 };

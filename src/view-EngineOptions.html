@@ -33,6 +33,7 @@
 		
 		#engineOptions_Dialog {
 			top: 29px;
+			overflow: auto;
 		}
 		
 		#engineOptions_Dialog h2 {
@@ -42,6 +43,48 @@
 		#engineOptions_Form {
 			margin-bottom: 36px;
 		}
+		
+		
+		#engineOptions_Dialog div[name="dialogWrapper"] {
+			max-height: 303px;
+			overflow: auto;
+		}
+		
+		
+/* 		#engineOptions_Dialog div.card[name="dialogContent"] { */
+/* 			max-height: 300px; */
+/* 			overflow: auto; */
+/* 		} */
+
+		@media only screen and (min-width: 400px) {
+		
+			#engineOptions_Dialog div[name="dialogWrapper"] {
+				max-height: 337px;
+			}
+		
+			
+		}
+
+		
+		@media only screen and (min-width: 600px) {
+		
+			#engineOptions_Dialog div[name="dialogWrapper"] {
+				max-height: 400px;
+			}
+			
+		}
+		
+		
+		@media only screen and (min-width: 1024px) {
+		
+			#engineOptions_Dialog div[name="dialogWrapper"] {
+				max-height: 700px;
+			}
+		
+			
+		}
+		
+		
 
 	</style>
 
@@ -62,82 +105,91 @@
 	
 	<h2>Engine settings</h2>
 	
+	
 	<paper-dialog-scrollable>
 	
-		<div class="card">
-<!-- 		<form is="iron-form" id="engineOptions_Form"> -->
-			<p>
-			<b>type:</b> {{selectedEngine.type}} <br>
-			<b>ID:</b> {{selectedEngine.engine._sysID}} <br>
-			<b>engine:</b> {{selectedEngine.engine.engine}}
-			</p>
-			
 	
-<!-- 			<paper-input name="netLocation" label="Net location" -->
-<!-- 				placeholder="[[netLocation]]" value="[[netLocation]]" required -->
-<!-- 				auto-validate></paper-input> -->
-<!-- 		</form> -->
-		</div>
+		<div name="dialogWrapper">
 	
-	
-	
-		<div class="card">
 		
-		<p>Every engine has it's own options. Could be changed when the engine is not working</p>
-		
-		<iron-collapse class="hiddenSection" name="engineOptions">
-		
-			<form is="iron-form" id="engineOptions_Form">
-			
-				<paper-input name="loopTime" 
-					label="Loop time"
-					placeholder="[[selectedEngine.ngnoptions.loopTime]]" 
-					value="[[selectedEngine.ngnoptions.loopTime]]" 
-					required hidden
-					auto-validate></paper-input>
+			<div class="card" name="dialogHeader">
+	<!-- 		<form is="iron-form" id="engineOptions_Form"> -->
+				<p>
+				<b>type:</b> {{selectedEngine.type}} <br>
+				<b>ID:</b> {{selectedEngine.engine._sysID}} <br>
+				<b>engine:</b> {{selectedEngine.engine.engine}}
+				</p>
 				
-				<paper-checkbox 
-					name="showDeltaTime" 
-					hidden>
-				  Show delta time
-				  <span class="subtitle">Diference between engine events</span>
-				</paper-checkbox>
+		
+	<!-- 			<paper-input name="netLocation" label="Net location" -->
+	<!-- 				placeholder="[[netLocation]]" value="[[netLocation]]" required -->
+	<!-- 				auto-validate></paper-input> -->
+	<!-- 		</form> -->
+			</div>
+		
+		
+		
+			<div class="card" name="dialogContent">
+			
+			<p>Every engine has it's own options. Could be changed when the engine is not working</p>
+			
+			<iron-collapse class="hiddenSection" name="engineOptions">
+			
+				<form is="iron-form" id="engineOptions_Form">
 				
-				<paper-checkbox 
-					name="showTime" 
-					hidden>
-				  Show current time
-				  <span class="subtitle">Current time</span>
-				</paper-checkbox>
-	
-				<paper-input name="ticks" 
-					label="Ticks"
-					placeholder="[[selectedEngine.ngnoptions.engineOptions.ticks]]" 
-					value="[[selectedEngine.ngnoptions.engineOptions.ticks]]" 
-					required
-					auto-validate
-					hidden></paper-input>
+					<paper-input name="loopTime" 
+						label="Loop time"
+						placeholder="[[selectedEngine.ngnoptions.loopTime]]" 
+						value="[[selectedEngine.ngnoptions.loopTime]]" 
+						required hidden
+						auto-validate></paper-input>
 					
-			  <paper-button raised 
-			  	id="button_saveOptions"
-			  	on-tap="_saveOptions_delayedSubmit" 
-			  	disabled>
-			    <paper-spinner id="button_saveOptionspinner" hidden></paper-spinner>
-			    Save
-			  </paper-button>
+					<paper-checkbox 
+						name="showDeltaTime" 
+						hidden>
+					  Show delta time
+					  <span class="subtitle">Diference between engine events</span>
+					</paper-checkbox>
+					
+					<paper-checkbox 
+						name="showTime" 
+						hidden>
+					  Show current time
+					  <span class="subtitle">Current time</span>
+					</paper-checkbox>
 		
-			</form>
+					<paper-input name="ticks" 
+						label="Ticks"
+						placeholder="[[selectedEngine.ngnoptions.engineOptions.ticks]]" 
+						value="[[selectedEngine.ngnoptions.engineOptions.ticks]]" 
+						required
+						auto-validate
+						hidden></paper-input>
+						
+				  <paper-button raised 
+				  	id="button_saveOptions"
+				  	on-tap="_saveOptions_delayedSubmit" 
+				  	disabled>
+				    <paper-spinner id="button_saveOptionspinner" hidden></paper-spinner>
+				    Save
+				  </paper-button>
 			
-		</iron-collapse>
-		
+				</form>
+				
+			</iron-collapse>
+			
+			</div>
+			
 		</div>
-	</paper-dialog-scrollable>
-	
 	
 <!-- 	<paper-button raised role="button" tabindex="0" animated="" -->
 <!-- 		aria-disabled="false" elevation="0" class="x-scope paper-button-0" -->
 <!-- 		on-tap="_getEngineOptions"> -->
 <!-- 	Get options</paper-button> -->
+		
+		
+		
+	</paper-dialog-scrollable>
 		
 		
 	<div class="buttons">
@@ -343,10 +395,14 @@
 			var _engineOptions = Polymer.dom(_view.root).querySelector('iron-collapse.hiddenSection[name="engineOptions"]');
 
 			
+		    var _scrollable = Polymer.dom(_engineOptions_Dialog).querySelector('paper-dialog-scrollable');
+		    _scrollable.dialogElement = _engineOptions_Dialog;
+			
+			
 			var _selectedEngine = _view.get('selectedEngine');
 			
-			console.log(_viewOptions); // TODO REMOVE DEBUG LOG
-			// console.log(_button.dataset); // TODO REMOVE DEBUG LOG
+			// console.log(_viewOptions); // TODO REMOVE DEBUG LOG
+			// console.log(_scrollable); // TODO REMOVE DEBUG LOG
 			// console.log(_view.selectedEngine); // TODO REMOVE DEBUG LOG
 			
 	        
@@ -357,8 +413,8 @@
 				_engineOptions_Dialog.fitInto = _viewOptions.refView;
 				// _engineOptions_Dialog.positionTarget = _viewOptions.refView;
 				// _engineOptions_Dialog.alwaysOnTop = true;
+				_engineOptions_Dialog.refit();
 				_engineOptions_Dialog.open();
-				
 			}, 167);
 			
 			_view.async(function(){
@@ -499,9 +555,9 @@
 							
 							_view.async(function(){
 								_engineOptions.notifyResize();
+								_engineOptions_Dialog.refit();
 								_engineOptions.show();
 								// _engineOptions_Dialog.notifyResize();
-								_engineOptions_Dialog.refit();
 								_form.validate();
 							}, 267);
 							

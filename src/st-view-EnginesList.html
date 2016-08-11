@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
@@ -13,6 +14,7 @@
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 
 
@@ -37,7 +39,16 @@
       
     </style>
 
-    <div class="card" id="enginesList">
+
+
+<paper-tabs selected="{{section_selected}}" scrollable>
+  <paper-tab>Engines List</paper-tab>
+  <paper-tab disabled="true">Engine settings</paper-tab>
+</paper-tabs>
+
+
+<iron-pages selected="{{section_selected}}">
+  	<div class="card" id="enginesList">
 <!--       <div class="circle">1</div> -->
       <h1>Engines</h1>
       
@@ -170,7 +181,18 @@
     </iron-list>
     
 
-    </div>
+    </div>	<!-- EndOf iron-page 0 -->
+  
+  
+  
+	<!--  Engine Settings dialog -->
+	<st-view-EngineOptions id="engineSettings">
+	</st-view-EngineOptions>
+  	<!-- EndOf iron-page 1 -->	
+  
+</iron-pages>
+
+
 
 
 
@@ -181,11 +203,6 @@
 	<paper-toast id="toast_OK" 
 		text="[[toast_Message]]"></paper-toast>
 		
-
-<!--  Engine Settings dialog -->
-
-	<st-view-EngineOptions id="engineSettings">
-	</st-view-EngineOptions>
 
 
 
@@ -251,6 +268,9 @@
 					// _engineOptions_Dialog.fitInto = _view;
 					// _engineOptions_Dialog.refit()
 
+					
+					_view.section_selected = 0;
+					
 					// Map event 'configChanged'
 					_consoleApp.domEvents
 							.addEventListener(
@@ -267,8 +287,10 @@
 					
 					
 
+					_view._init_EngineOptions();
 					_view._init_Toast();
-				},
+
+				}, 	// EndOf ready
 
 				_init_Toast: function() {
 
@@ -279,8 +301,28 @@
 					_view.toast_ErrorMessage = "";
 					_view.toast_Message = "";
 
-				},
+				}, 	// EndOf _init_Toast
 
+				
+				_init_EngineOptions: function() {
+					
+					var _view = this;
+					var _engineSettings = _view.$.engineSettings;
+
+					// Map event 'closeOptions'
+					_engineSettings.addEventListener(
+								'closeOptions',
+								function(event) {
+
+									console.log("st-view-EnginesList.closeOptions"); // TODO REMOVE DEBUG LOG
+									console.log(event); // TODO REMOVE DEBUG LOG
+									
+									_view.section_selected = 0;
+
+								});
+
+				}, 	// EndOf _init_EngineOptions
+				
 				attached: function() {
 					// Use the document element
 // 					this.$.listForSensors.scrollTarget = this.ownerDocument.documentElement;
@@ -507,8 +549,12 @@
 					console.log(_item); // TODO REMOVE DEBUG LOG
 					
 					_engineSettings.set("selectedEngine", _selectedEngine);
-					_engineSettings.viewOptions.refView = _view;
-					_engineSettings.showModal();
+					
+					// _engineSettings.viewOptions.refView = _view;
+					// _engineSettings.showModal();
+					
+					_engineSettings.showSettings();
+					_view.section_selected = 1;
 					
 				},	// enfOf _engineSettings
 				

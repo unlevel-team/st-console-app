@@ -45,22 +45,26 @@
 		}
 		
 		
+		/*
 		#engineOptions_Dialog div[name="dialogWrapper"] {
 			max-height: 303px;
 			overflow: auto;
 		}
+		*/
 		
 		
-/* 		#engineOptions_Dialog div.card[name="dialogContent"] { */
-/* 			max-height: 300px; */
-/* 			overflow: auto; */
-/* 		} */
+/* 		#engineOptions_Dialog div.card[name="dialogContent"] { 
+			max-height: 300px; 
+			overflow: auto; 
+ 		} */
 
 		@media only screen and (min-width: 400px) {
 		
+			/*
 			#engineOptions_Dialog div[name="dialogWrapper"] {
 				max-height: 337px;
 			}
+			*/
 		
 			
 		}
@@ -68,19 +72,22 @@
 		
 		@media only screen and (min-width: 600px) {
 		
+			/*
 			#engineOptions_Dialog div[name="dialogWrapper"] {
 				max-height: 400px;
 			}
+			*/
 			
 		}
 		
 		
 		@media only screen and (min-width: 1024px) {
 		
+			/*
 			#engineOptions_Dialog div[name="dialogWrapper"] {
 				max-height: 700px;
 			}
-		
+		 	*/
 			
 		}
 		
@@ -97,16 +104,23 @@
 
 
 <!--  Engine options dialog -->
-	<paper-dialog id="engineOptions_Dialog"
-		role="dialog" 
-		aria-hidden="true" 
-		style="outline: none; display: none;">
+
+<!-- 	<paper-dialog id="engineOptions_Dialog" -->
+<!-- 		role="dialog"  -->
+<!-- 		aria-hidden="true"  -->
+<!-- 		style="outline: none; display: none;"> -->
+
+
+
+	<div id="engineOptions_Dialog"
+		aria-hidden="true"
+		class="card">
 	
 	
 	<h2>Engine settings</h2>
 	
 	
-	<paper-dialog-scrollable>
+<!-- 	<paper-dialog-scrollable> -->
 	
 	
 		<div name="dialogWrapper">
@@ -189,7 +203,7 @@
 		
 		
 		
-	</paper-dialog-scrollable>
+<!-- 	</paper-dialog-scrollable> -->
 		
 		
 	<div class="buttons">
@@ -198,7 +212,8 @@
 			on-tap="_getEngineOptions">Get options</paper-button>
 		
 		<paper-button dialog-dismiss="" role="button" tabindex="0" animated=""
-			aria-disabled="false" elevation="0" class="x-scope paper-button-0">Close</paper-button>
+			aria-disabled="false" elevation="0" class="x-scope paper-button-0"
+			on-tap="_closeOptions">Close</paper-button>
 			
 <!-- 		<paper-button dialog-confirm="" autofocus="" role="button" tabindex="0" -->
 <!-- 			animated="" aria-disabled="false" elevation="0" -->
@@ -206,10 +221,10 @@
 <!-- 			disabled>Accept</paper-button> -->
 			
 	</div>
-	
-	</paper-dialog> 
-    
-    
+
+
+<!-- 	</paper-dialog>  -->
+   </div>  <!-- EndOF #engineOptions_Dialog -->
     
 
   </template>
@@ -417,15 +432,29 @@
 				_engineOptions_Dialog.open();
 			}, 167);
 			
-			_view.async(function(){
-				// Notification required for binding to update!
-		        _view.notifyPath('selectedEngine.type', _selectedEngine.type);
-		        _view.notifyPath('selectedEngine.engine', _selectedEngine.engine);
-			}, 267);
        		
+			_view.showSettings();
+			
        	},	// endOf showModal
        	
 		
+       	showSettings() {
+       		
+			var _view = this;
+			var _selectedEngine = _view.get('selectedEngine');
+			var _engineOptions = Polymer.dom(_view.root).querySelector('iron-collapse.hiddenSection[name="engineOptions"]');
+
+			_view.async(function(){
+				
+				_engineOptions.hide();
+				
+				// Notification required for binding to update!
+		        _view.notifyPath('selectedEngine.type', _selectedEngine.type);
+		        _view.notifyPath('selectedEngine.engine', _selectedEngine.engine);
+			}, 67);
+
+       	},
+       	
 		_getEngineOptions: function(e, detail) {
 			
 			console.log("_getEngineOptions"); // TODO REMOVE DEBUG LOG
@@ -555,7 +584,7 @@
 							
 							_view.async(function(){
 								_engineOptions.notifyResize();
-								_engineOptions_Dialog.refit();
+								// _engineOptions_Dialog.refit();
 								_engineOptions.show();
 								// _engineOptions_Dialog.notifyResize();
 								_form.validate();
@@ -846,7 +875,15 @@
 		  	  }, 1000);
 		  	  
 		  	  
-	    }  // endOf _saveOptions_delayedSubmit
+	    },  // endOf _saveOptions_delayedSubmit
+	    
+	    
+		_closeOptions(e, detail) {
+			var _view = this;
+			
+			_view.fire('closeOptions', {closed: true});
+
+	    }  // endOf _closeOptions
 
 	});
 	

@@ -24,6 +24,7 @@ gulp.task('docs', function(done) {
 
 
 
+
 gulp.task('watch', function() {
 //    gulp.watch(paths.es6, ['babel']);
 });

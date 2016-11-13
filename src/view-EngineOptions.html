@@ -151,6 +151,43 @@
 			
 				<form is="iron-form" id="engineOptions_Form">
 				
+					
+				    <template id="customOptions" 
+				    	is="dom-if" if="{{selectedEngine.ngnoptions.engineOptions._customOptions !== undefined}}">
+					    <template is="dom-repeat"
+					    	items="{{selectedEngine.ngnoptions.engineOptions._customOptions}}"
+					    	index-as="index"
+					    	as="customop">
+					    
+					    
+    					    <template is="dom-if" if="{{_showField_forCustomOptions(index, 'number')}}">
+		    					<paper-input name="{{customop.name}}" 
+									label="[[customop.alias]]"
+									placeholder="[[customop._model.value]]" 
+									value="[[customop._model.value]]" 
+									required
+									disabled$={{!_is_EditEnabled()}}
+									auto-validate>
+								</paper-input>
+								<br>
+					    	</template>
+					    	
+    					    <template is="dom-if" if="{{_showField_forCustomOptions(index, 'boolean')}}">
+	    						<paper-checkbox 
+									name="{{customop.name}}" 
+									checked$="{{customop._model.value}}"
+									disabled$={{!_is_EditEnabled()}}>
+									{{customop.alias}}
+								  <span class="subtitle">{{customop.description}}</span>
+								</paper-checkbox>
+								<br>
+					    	</template>
+					    	
+					        
+					        
+					    </template>
+				    </template>
+				
 					<paper-input name="loopTime" 
 						label="Loop time"
 						placeholder="[[selectedEngine.ngnoptions.loopTime]]" 
@@ -158,27 +195,8 @@
 						required hidden
 						auto-validate></paper-input>
 					
-					<paper-checkbox 
-						name="showDeltaTime" 
-						hidden>
-					  Show delta time
-					  <span class="subtitle">Diference between engine events</span>
-					</paper-checkbox>
-					
-					<paper-checkbox 
-						name="showTime" 
-						hidden>
-					  Show current time
-					  <span class="subtitle">Current time</span>
-					</paper-checkbox>
-		
-					<paper-input name="ticks" 
-						label="Ticks"
-						placeholder="[[selectedEngine.ngnoptions.engineOptions.ticks]]" 
-						value="[[selectedEngine.ngnoptions.engineOptions.ticks]]" 
-						required
-						auto-validate
-						hidden></paper-input>
+						
+						
 						
 				  <paper-button raised 
 				  	id="button_saveOptions"
@@ -275,7 +293,6 @@
 	    
 	    
 	    observers: [
-	                
                   	'_engineChanged(selectedEngine)',
                   	'_engineChanged(selectedEngine.*)'
                 ],
@@ -295,8 +312,12 @@
     		
     		_view._init_engineOptions_Form();
         },
-       	
-       	
+        
+        
+        /**
+         * Init engine options form
+         *
+         */
         _init_engineOptions_Form: function() {
       	  
       	  var _view = this;
@@ -313,11 +334,14 @@
       	  console.log("st-view-EngineOptions._init_engineOptions_Form");	// TODO REMOVE DEBUG LOG
       	  
       	  
+      	  // Map event 'change'
       	  _form.addEventListener('change', function(event) {
       		    // Validate the entire form to see if we should enable the `Submit` button.
       		    _buttonSubmit.disabled = !_form.validate();
       		  });
       	  
+      	  
+      	  // Map event 'iron-form-submit'
       	  _form.addEventListener('iron-form-submit', function(event) {
       		  
       		  	event.preventDefault();
@@ -340,33 +364,16 @@
         },	// EndOf _init_engineOptions_Form
         
         
-        
+        /**
+         * Reset form
+         *
+         */
         _resetForm() {
         	
         	var _view = this;
         	var _selectedEngine = _view.get('selectedEngine');
 			var _form = _view.$.engineOptions_Form;
 			var _buttonSubmit = _view.$.button_saveOptions;
-			
-			var _fields = [
-               	{ 
-               		'name': 'loopTime', 
-            	 	'element': 'paper-input' 
-           	 	},
-           	 	{ 
-           	 		'name': 'showDeltaTime', 
-                	'element': 'paper-checkbox' 
-                },
-           	 	{ 
-           	 		'name': 'showTime', 
-                	'element': 'paper-checkbox' 
-                },
-               	{ 
-               		'name': 'ticks', 
-            	 	'element': 'paper-input' 
-           	 	}
-
-            ];
 			
 			
 			// Only edit options on some states
@@ -378,17 +385,6 @@
 
 			
 			_form.reset();
-			
-			_fields.forEach(function(_field, _i) {
-				
-				var _q = '#engineOptions_Dialog ' + _field.element + '[name="' + _field.name + '"]';
-				var _element = Polymer.dom(_view.root).querySelector(_q);
-				
-				_element.hidden = true;
-				_element.required = false;
-				_element.disabled = !_editEnabled;
-			});
-
 			_form.validate();
 			
 			_buttonSubmit.disabled = !_editEnabled;
@@ -396,6 +392,10 @@
         },	// endOf _resetForm
        	
        	
+        /**
+         * Show modal
+         *
+         */
        	showModal: function(options) {
        		
 			console.log("_showModal"); // TODO REMOVE DEBUG LOG
@@ -438,6 +438,10 @@
        	},	// endOf showModal
        	
 		
+        /**
+         * Show settings
+         *
+         */
        	showSettings() {
        		
 			var _view = this;
@@ -455,6 +459,11 @@
 
        	},
        	
+       	
+        /**
+         * Get engine options
+         *
+         */
 		_getEngineOptions: function(e, detail) {
 			
 			console.log("_getEngineOptions"); // TODO REMOVE DEBUG LOG
@@ -532,8 +541,29 @@
 							}
 							
 							
-							var _ngnFormInput = {};
+							// Set up custom options
+							if (_ngnOptions.engineOptions._customOptions !== undefined) {
+								_ngnOptions.engineOptions._customOptions.forEach(function(_customOp, _i) {
+									
+									_customOp._model = {
+										'value':  _view._getValue_ofCustomOption({
+														'view': _view,
+														'customOp': _customOp
+													}),
+										'isVisible': false
+									};
+									 
+									if (_customOp.alias === undefined) {
+										_customOp.alias = _customOp.name;
+									}
+									
+									
+								});
+							}
 							
+							
+							// Set 'loopTime'
+							var _ngnFormInput = {};
 							_ngnFormInput.loopTime = Polymer.dom(_view.root)
 								.querySelector('#engineOptions_Dialog paper-input[name="loopTime"]');
 							
@@ -541,45 +571,6 @@
 								_ngnFormInput.loopTime.hidden = false;
 								_ngnFormInput.loopTime.disabled = !_editEnabled;
 							}
-							
-									
-							switch (_engine.engine) {
-							
-								case 'STSensor_Dummy01':
-								case 'STActuator_Dummy01':
-									
-									_ngnFormInput.showDeltaTime = Polymer.dom(_view.root)
-										.querySelector('#engineOptions_Dialog paper-checkbox[name="showDeltaTime"]');
-									
-									_ngnFormInput.showTime = Polymer.dom(_view.root)
-										.querySelector('#engineOptions_Dialog paper-checkbox[name="showTime"]');
-									
-									_ngnFormInput.ticks = Polymer.dom(_view.root)
-										.querySelector('#engineOptions_Dialog paper-input[name="ticks"]');
-
-									if (_ngnOptions.engineOptions.showDeltaTime === true) {
-										
-										_ngnFormInput.showDeltaTime.checked = true;
-									}
-									_ngnFormInput.showDeltaTime.hidden = false;
-									_ngnFormInput.showDeltaTime.disabled = !_editEnabled;
-
-									
-									if (_ngnOptions.engineOptions.showTime === true) {
-										_ngnFormInput.showTime.checked = true;
-									}
-									_ngnFormInput.showTime.hidden = false;
-									_ngnFormInput.showTime.disabled = !_editEnabled;
-
-									_ngnFormInput.ticks.hidden = false;
-									_ngnFormInput.ticks.disabled = !_editEnabled;
-									
-									break;
-
-								default:
-									break;
-							}
-									
 							
 							
 							_view.async(function(){
@@ -621,7 +612,9 @@
 		},	// endOf _getEngineOptions
 	    
 		
-		
+	    /**
+	     * Save engine options
+	     */
 		_saveEngineOptions: function(options) {
 			
 			if (options === undefined) {
@@ -672,69 +665,60 @@
 			}
 			
 			
-			switch (_engine.engine) {
-			
-		  		case 'STSensor_Dummy01':
-				case 'STActuator_Dummy01':
+			// Add custom options
+			if (_ngnOptions.engineOptions._customOptions !== undefined) {
 				
-					var _ngnOptionsCustom = _ngnOptions.engineOptions;
-					
-					_ngnOptionsData.engineOptions = {};
-					var _ngnOpsDataCustom = _ngnOptionsData.engineOptions;
-					
-					// 'showDeltaTime' option
-					if (_ngnOptionsCustom.showDeltaTime !== undefined) {
-						_ngnOpsDataCustom.showDeltaTime = _ngnOptionsCustom.showDeltaTime;
-						if (_formData.showDeltaTime !== undefined) {
-							switch (_formData.showDeltaTime) {
-								case 'on':
-									_ngnOpsDataCustom.showDeltaTime = true;
-									break;
-	
-								default:
-									_ngnOpsDataCustom.showDeltaTime = false;
-									break;
-							}
-						} else {
-							_ngnOpsDataCustom.showDeltaTime = false;
-						}
-					}
-
-					// 'showTime' option
-					if (_ngnOptionsCustom.showTime !== undefined) {
-						_ngnOpsDataCustom.showTime = _ngnOptionsCustom.showTime;
-						if (_formData.showTime !== undefined) {
-							switch (_formData.showTime) {
-								case 'on':
-									_ngnOpsDataCustom.showTime = true;
-									break;
-	
-								default:
-									_ngnOpsDataCustom.showTime = false;
-									break;
-							}
-						} else {
-							_ngnOpsDataCustom.showTime = false;
-						}
-					}
-					
-					
-					// 'ticks' option
-					if (_ngnOptionsCustom.ticks !== undefined) {
-						_ngnOpsDataCustom.ticks = _ngnOptionsCustom.ticks;
-						if (_formData.ticks !== undefined) {
-							_ngnOpsDataCustom.ticks = _formData.ticks;
-						}
-					}
+				var _customOptions = _ngnOptions.engineOptions._customOptions;
+				
+				_ngnOptionsData.engineOptions = {};
+				var _ngnOpsDataCustom = _ngnOptionsData.engineOptions;
+				
+				
+			  	console.log("st-view-EngineOptions._saveEngineOptions.<Add custom options>");	// TODO REMOVE DEBUG LOG
+			  	console.log(_ngnOptions.engineOptions);	// TODO REMOVE DEBUG LOG
+			  	console.log(_customOptions);	// TODO REMOVE DEBUG LOG
 
 				
-					break;
-	
-				default:
-					break;
+				_customOptions.forEach( function(_customOP, _i) {
+					
+					if (_customOP._model.isVisible === true) {
+						
+						var _domitem = null;
+						
+						var _value = null;
+						
+						switch (_customOP.type) {
+							
+							case 'number':
+								
+								if (_formData[_customOP.name] !== undefined) {
+									_value = _formData[_customOP.name];
+								}
+								
+								break
+								
+							case 'boolean':
+								if (_formData[_customOP.name] !== undefined) {
+									_value = true;
+								} else {
+									_value = false;
+								}
+
+								break;
+								
+							default:
+								break;
+						}
+						
+						
+						_ngnOpsDataCustom[_customOP.name] = _value;
+					
+					}
+					
+					
+				});
+				
 			}
-			  	
-			
 			
 			
 			// var _scs_Request = null;
@@ -745,29 +729,11 @@
 			switch (_selectedEngine.type) {
 			
 				case 'sensor':
-					/*
-					_scs_Request = st_ConsoleApp.engines.sensors.set_SensorOptions;
-					_scs_RequestOptions = {
-							"consoleApp" : _consoleApp,
-							"sensorID": _selectedEngine.engine._sysID,
-							"sensorOptions": _ngnOptionsData
-						};
-					*/
-					
 					_ngntype = 'sensors';
 					
 					break;
 					
 				case 'actuator':
-					/*
-					_scs_Request = st_ConsoleApp.engines.actuators.set_ActuatorOptions;
-					_scs_RequestOptions = {
-							"consoleApp" : _consoleApp,
-							"actuatorID": _selectedEngine.engine._sysID,
-							"actuatorOptions": _ngnOptionsData
-						};
-					*/
-					
 					_ngntype = 'actuators';
 
 					break;
@@ -853,8 +819,12 @@
 			
 			
 		},	// endOf _saveEngineOptions
-
 		
+		
+        /**
+         * Delayed submit for save options
+         *
+         */
 		_saveOptions_delayedSubmit: function(event) {
 	  	  
 	  	  var _view = this;
@@ -878,6 +848,95 @@
 	    },  // endOf _saveOptions_delayedSubmit
 	    
 	    
+        /**
+         * Check for edit enabled
+         *
+         */
+	    _is_EditEnabled() {
+	    	
+			var _view = this;
+			var _selectedEngine = _view.get('selectedEngine');
+			var _engine = _selectedEngine.engine;
+
+			// Only edit options on some states
+			var _editEnabled = false;
+			if (_engine.state === 'config' || 
+					_engine.state === 'ready') {
+				_editEnabled = true;
+			}
+			
+			return _editEnabled;
+	    },	// endOf _is_EditEnabled
+	    
+	    
+	    /**
+	     * Show Field for custom options
+	     */
+	    _showField_forCustomOptions(index, typeref) {
+	    	
+	    	var _view = this;
+	    	var _customOptions = _view.selectedEngine.ngnoptions.engineOptions._customOptions;
+	    	
+	    	var _customOp = _customOptions[index];
+	    	
+	    	var _result = false;
+	    	
+	    	switch (typeref) {
+	    	
+				case 'number':
+					if (_customOp.type === 'number') {
+						_result = true;
+					}
+					break;
+					
+				case 'boolean':
+					if (_customOp.type === 'boolean') {
+						_result = true;
+					}
+					break;					
+	
+				default:
+					break;
+			}
+	    	
+	    	
+	    	if (_result === true) {
+	    		_customOp._model.isVisible = true;;
+	    	}
+	    	
+	    	return _result;
+	    },	// _showField_forCustomOptions
+	    
+	    
+	    /**
+	     * Get value of custom options
+	     */
+	    _getValue_ofCustomOption(options) {
+	    	
+			var _view = this;
+
+			if (options.view !== undefined) {
+				_view = options.view;
+			}
+			
+		  	var _selectedEngine = _view.get('selectedEngine');
+		  	var _engine = _selectedEngine.engine;
+		  	var _ngnOptions = _selectedEngine.ngnoptions.engineOptions;
+
+			
+			var _customOp = options.customOp;
+			
+			
+			var _result = null;
+			
+			if (_ngnOptions.hasOwnProperty(_customOp.name)) {
+				_result = _ngnOptions[_customOp.name];
+			}
+			
+			return _result;
+	    },
+	    
+	    
 		_closeOptions(e, detail) {
 			var _view = this;
 			
@@ -887,11 +946,7 @@
 
 	});
 	
-
-	
-	
 	</script>
-
 
 
 </dom-module>

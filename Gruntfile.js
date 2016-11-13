@@ -50,7 +50,7 @@ module.exports = function(grunt) {
         dist: {
             files: [{
                 "expand": true,
-                "cwd": "src/stConsoleApp/",
+                "cwd": "consoleApp_Lib/src/",
                 "src": ["**/*.js"],
                 "dest": "build/stConsoleApp/",
                 "ext": ".js"
